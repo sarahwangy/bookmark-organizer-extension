@@ -11,6 +11,20 @@ A Chrome new-tab extension that replaces the default new-tab page with a magazin
 - Card size options and dark mode
 - Works directly on your real Chrome bookmarks — no external server, no account, no data leaves your browser
 
+## Screenshots
+
+**Grid overview** — all bookmarks as cards, sorted/filtered from the top bar
+![Grid overview](screenshots/01-grid-overview.png)
+
+**YouTube thumbnails** — video bookmarks show their real thumbnail
+![YouTube thumbnails](screenshots/02-youtube-thumbnails.png)
+
+**Smart grouping** — one-click suggestions to group bookmarks scattered across folders by domain
+![Smart grouping](screenshots/03-smart-grouping.png)
+
+**Large cards + dark mode** — adjustable card size and theme
+![Large cards and settings](screenshots/04-large-cards-settings.png)
+
 ## Installation
 
 This extension is not published on the Chrome Web Store — install it manually in developer mode:
