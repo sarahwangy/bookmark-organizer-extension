@@ -14,6 +14,11 @@
       sortDateAsc: '最早添加',
       sortTitleAsc: '标题 A→Z',
       sortTitleDesc: '标题 Z→A',
+      yearFilterTitle: '按年份筛选',
+      monthFilterTitle: '按月份筛选',
+      allYears: '全部年份',
+      allMonths: '全部月份',
+      monthNames: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
       groupSuggestBtn: '智能分组',
       deadLinkBtn: '检查失效链接',
       refreshBtn: '刷新',
@@ -40,7 +45,7 @@
       duplicates: '🔁 重复书签',
       unnamedFolder: '未命名文件夹',
       itemsSuffix: ' 项',
-      filteredSuffix: '（已按关键词筛选）',
+      filteredSuffix: '（已按条件筛选）',
       selectedCount: n => '已选择 ' + n + ' 项',
       youtubeBadge: 'YouTube',
       deadBadge: '⚠ 可能失效',
@@ -86,6 +91,11 @@
       sortDateAsc: 'Oldest First',
       sortTitleAsc: 'Title A→Z',
       sortTitleDesc: 'Title Z→A',
+      yearFilterTitle: 'Filter by year',
+      monthFilterTitle: 'Filter by month',
+      allYears: 'All Years',
+      allMonths: 'All Months',
+      monthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
       groupSuggestBtn: 'Smart Group',
       deadLinkBtn: 'Check Dead Links',
       refreshBtn: 'Refresh',
@@ -112,7 +122,7 @@
       duplicates: '🔁 Duplicates',
       unnamedFolder: 'Untitled Folder',
       itemsSuffix: ' items',
-      filteredSuffix: ' (filtered by keyword)',
+      filteredSuffix: ' (filtered)',
       selectedCount: n => n + ' selected',
       youtubeBadge: 'YouTube',
       deadBadge: '⚠ Possibly dead',
@@ -164,6 +174,7 @@
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
     document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+    renderMonthFilterOptions();
   }
 
   if(!(window.chrome && chrome.bookmarks)){
@@ -187,6 +198,8 @@
     siteFilterQuery: '',
     collapsed: new Set(),
     typeFilter: 'all',       // all | youtube | other
+    yearFilter: 'all',       // all | '2026'
+    monthFilter: 'all',      // all | 1-12
     sort: 'date_desc',       // date_desc | date_asc | title_asc | title_desc
     cardSize: 'md',          // sm | md | lg
     viewMode: 'grid',        // grid | list
@@ -518,7 +531,16 @@
     } else if(state.typeFilter === 'other'){
       items = items.filter(({node}) => !getYouTubeId(node.url));
     }
+    if(state.yearFilter !== 'all'){
+      items = items.filter(({node}) => node.dateAdded && new Date(node.dateAdded).getFullYear() === Number(state.yearFilter));
+    }
+    if(state.monthFilter !== 'all'){
+      items = items.filter(({node}) => node.dateAdded && (new Date(node.dateAdded).getMonth() + 1) === Number(state.monthFilter));
+    }
     return sortItems(items);
+  }
+  function hasDateFilter(){
+    return state.yearFilter !== 'all' || state.monthFilter !== 'all';
   }
 
   function renderMainHeader(){
@@ -534,7 +556,7 @@
       mainTitleEl.textContent = '🌐 ' + state.currentView.slice(5);
     }
     const items = currentBookmarks();
-    mainSubEl.textContent = items.length + t('itemsSuffix') + (state.searchQuery ? t('filteredSuffix') : '');
+    mainSubEl.textContent = items.length + t('itemsSuffix') + ((state.searchQuery || hasDateFilter()) ? t('filteredSuffix') : '');
     document.getElementById('autoSelectDupBtn').style.display = state.currentView === 'duplicates' ? 'inline-flex' : 'none';
   }
 
@@ -822,10 +844,50 @@
     bar.classList.toggle('show', n > 0);
   }
 
+  function renderYearFilterOptions(){
+    const sel = document.getElementById('yearFilter');
+    const years = new Set();
+    allBookmarks(state.tree).forEach(({node}) => {
+      if(node.dateAdded) years.add(new Date(node.dateAdded).getFullYear());
+    });
+    const sorted = Array.from(years).sort((a,b) => b - a);
+    const prev = state.yearFilter;
+    sel.innerHTML = '';
+    const allOpt = document.createElement('option');
+    allOpt.value = 'all';
+    allOpt.textContent = t('allYears');
+    sel.appendChild(allOpt);
+    sorted.forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = String(y);
+      opt.textContent = String(y);
+      sel.appendChild(opt);
+    });
+    if(prev !== 'all' && !sorted.includes(Number(prev))) state.yearFilter = 'all';
+    sel.value = state.yearFilter;
+  }
+  function renderMonthFilterOptions(){
+    const sel = document.getElementById('monthFilter');
+    const names = t('monthNames');
+    sel.innerHTML = '';
+    const allOpt = document.createElement('option');
+    allOpt.value = 'all';
+    allOpt.textContent = t('allMonths');
+    sel.appendChild(allOpt);
+    names.forEach((name, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i + 1);
+      opt.textContent = name;
+      sel.appendChild(opt);
+    });
+    sel.value = state.monthFilter;
+  }
+
   function render(){
     renderVirtualViews();
     renderSiteList();
     renderFolderTree();
+    renderYearFilterOptions();
     renderMainHeader();
     renderGrid();
     renderMoveSelect();
@@ -947,6 +1009,14 @@
   });
   document.getElementById('sortSelect').addEventListener('change', (e) => {
     state.sort = e.target.value;
+    render();
+  });
+  document.getElementById('yearFilter').addEventListener('change', (e) => {
+    state.yearFilter = e.target.value;
+    render();
+  });
+  document.getElementById('monthFilter').addEventListener('change', (e) => {
+    state.monthFilter = e.target.value;
     render();
   });
 
