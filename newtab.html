@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>书签整理台</title>
+<style>
+  :root{
+    --bg:#f4f3ef;
+    --panel:#ffffff;
+    --ink:#1c1b19;
+    --sub:#726f68;
+    --line:#e7e4dd;
+    --accent:#e8542e;
+    --accent-ink:#ffffff;
+    --card-shadow: 0 1px 2px rgba(28,27,25,.06), 0 6px 16px rgba(28,27,25,.06);
+    --card-shadow-hover: 0 4px 10px rgba(28,27,25,.10), 0 14px 28px rgba(28,27,25,.12);
+    --radius: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:14px;
+    padding:12px 20px; background:var(--panel); border-bottom:1px solid var(--line);
+    flex-shrink:0; z-index:20;
+  }
+  .brand{display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; letter-spacing:.2px; white-space:nowrap;}
+  .brand .dot{width:10px;height:10px;border-radius:3px;background:var(--accent);}
+  .search{
+    flex:1; max-width:420px; display:flex; align-items:center; gap:8px;
+    background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:7px 12px;
+  }
+  .search input{border:none; background:transparent; outline:none; width:100%; font-size:13.5px; color:var(--ink);}
+  .search svg{flex-shrink:0; opacity:.55;}
+  .topbar-actions{display:flex; gap:8px; margin-left:auto;}
+  .btn{
+    border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    padding:7px 13px; border-radius:9px; font-size:13px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap; transition:all .12s ease;
+  }
+  .btn:hover{border-color:#cfccc3; background:#faf9f6;}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .btn.primary:hover{background:#cf4726;}
+  .btn.ghost{border-color:transparent; background:transparent;}
+  .btn.ghost:hover{background:var(--bg);}
+  .btn.small{padding:5px 10px; font-size:12px;}
+  .btn:disabled{opacity:.4; cursor:default;}
+
+  /* ---------- Layout ---------- */
+  .layout{flex:1; display:flex; min-height:0;}
+  .sidebar{
+    width:250px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; padding:14px 10px; overflow-y:auto;
+  }
+  .sidebar-section-title{
+    font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--sub);
+    padding:8px 10px 6px;
+  }
+  .tree-item{
+    display:flex; align-items:center; gap:6px; padding:7px 8px; border-radius:8px;
+    cursor:pointer; font-size:13.5px; user-select:none; position:relative;
+  }
+  .tree-item:hover{background:var(--bg);}
+  .tree-item.active{background:#fdece7; color:var(--accent); font-weight:600;}
+  .tree-item.drag-over{outline:2px dashed var(--accent); outline-offset:-2px; background:#fdece7;}
+  .tree-item .caret{
+    width:14px; height:14px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    color:var(--sub); transition:transform .1s ease;
+  }
+  .tree-item .caret.collapsed{transform:rotate(-90deg);}
+  .tree-item .caret.empty{visibility:hidden;}
+  .tree-item .name{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .tree-item .count{font-size:11px; color:var(--sub); background:var(--bg); border-radius:20px; padding:1px 7px;}
+  .tree-item.active .count{background:#f7d9cd; color:var(--accent);}
+  .tree-children{margin-left:16px;}
+  .tree-children.collapsed{display:none;}
+  .sidebar-divider{height:1px; background:var(--line); margin:10px 6px;}
+  .new-folder-btn{
+    display:flex; align-items:center; gap:6px; padding:8px 10px; margin:2px 4px;
+    font-size:13px; color:var(--sub); border-radius:8px; cursor:pointer; border:1px dashed var(--line);
+  }
+  .new-folder-btn:hover{color:var(--ink); border-color:#c9c5ba;}
+  .new-folder-btn.drag-over{border-color:var(--accent); color:var(--accent); background:#fdece7;}
+  .trash-zone{
+    display:flex; align-items:center; gap:6px; padding:8px 10px; margin:8px 4px 2px;
+    font-size:13px; color:var(--sub); border-radius:8px; cursor:default;
+  }
+  .trash-zone.drag-over{background:#fdeceb; color:#c62828; outline:2px dashed #c62828; outline-offset:-2px;}
+
+  /* ---------- Main grid ---------- */
+  .main{flex:1; overflow-y:auto; padding:22px 26px 100px;}
+  .main-header{display:flex; align-items:baseline; gap:10px; margin-bottom:16px;}
+  .main-header h1{font-size:19px; margin:0;}
+  .main-header .sub{color:var(--sub); font-size:13px;}
+  .empty-state{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:80px 20px; color:var(--sub); text-align:center; gap:10px;
+  }
+  .empty-state .big{font-size:34px;}
+
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px;
+  }
+
+  .card{
+    background:var(--panel); border-radius:var(--radius); overflow:hidden; cursor:pointer;
+    box-shadow:var(--card-shadow); border:2px solid transparent; position:relative;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    display:flex; flex-direction:column;
+  }
+  .card:hover{transform:translateY(-3px); box-shadow:var(--card-shadow-hover);}
+  .card.selected{border-color:var(--accent);}
+  .card.dragging{opacity:.4;}
+
+  .card-thumb{
+    position:relative; width:100%; aspect-ratio:16/10; background:#eeece6;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .card-thumb img.thumb-img{width:100%; height:100%; object-fit:cover; display:block;}
+  .card-thumb .yt-play{
+    position:absolute; width:44px; height:44px; border-radius:50%; background:rgba(0,0,0,.55);
+    display:flex; align-items:center; justify-content:center; pointer-events:none;
+  }
+  .card-thumb .yt-play svg{margin-left:3px;}
+  .card-thumb .yt-badge{
+    position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,.65); color:#fff;
+    font-size:10px; padding:2px 6px; border-radius:4px; letter-spacing:.3px; font-weight:600;
+  }
+  .card-thumb.generic{background-size:cover; background-position:center;}
+  .card-thumb.generic .favicon-big{
+    width:46px; height:46px; border-radius:12px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.15);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .card-thumb.generic .favicon-big img{width:26px; height:26px;}
+  .card-thumb.generic .favicon-big .fallback-letter{font-size:20px; font-weight:700; color:#fff;}
+
+  .card-body{padding:10px 11px 11px; display:flex; flex-direction:column; gap:5px;}
+  .card-title{
+    font-size:12.8px; font-weight:600; line-height:1.35; color:var(--ink);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .card-domain{display:flex; align-items:center; gap:5px; font-size:11px; color:var(--sub);}
+  .card-domain img{width:12px; height:12px; border-radius:3px;}
+
+  .card-select{
+    position:absolute; top:8px; left:8px; z-index:2;
+    width:20px; height:20px; border-radius:6px; background:rgba(255,255,255,.9);
+    border:1.5px solid #d8d5cc; display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity .12s ease; cursor:pointer;
+  }
+  .card:hover .card-select, .card.selected .card-select{opacity:1;}
+  .card.selected .card-select{background:var(--accent); border-color:var(--accent);}
+  .card-select svg{display:none;}
+  .card.selected .card-select svg{display:block;}
+
+  .card-open{
+    position:absolute; top:8px; right:8px; z-index:2; width:22px; height:22px; border-radius:6px;
+    background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity .12s ease;
+  }
+  .card:hover .card-open{opacity:1;}
+
+  /* ---------- Selection toolbar ---------- */
+  .selection-bar{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(120%);
+    background:#1c1b19; color:#fff; border-radius:14px; padding:10px 12px 10px 18px;
+    display:flex; align-items:center; gap:12px; box-shadow:0 10px 30px rgba(0,0,0,.25);
+    transition:transform .18s ease; z-index:30;
+  }
+  .selection-bar.show{transform:translateX(-50%) translateY(0);}
+  .selection-bar .count{font-size:13px; font-weight:600; white-space:nowrap;}
+  .selection-bar select{
+    background:#302e2b; color:#fff; border:1px solid #46443f; border-radius:8px; padding:7px 10px; font-size:12.5px;
+  }
+  .selection-bar .btn{background:#302e2b; border-color:#46443f; color:#fff;}
+  .selection-bar .btn:hover{background:#3c3a36;}
+  .selection-bar .btn.danger:hover{background:#5c2420; border-color:#7a3129;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(20,19,17,.35); display:none;
+    align-items:center; justify-content:center; z-index:50;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:var(--panel); color:var(--ink); border-radius:14px; padding:20px; width:320px; box-shadow:0 20px 50px rgba(0,0,0,.25);
+  }
+  .modal.wide{width:420px; max-height:70vh; overflow-y:auto;}
+  .suggest-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 0; border-bottom:1px solid var(--line);
+  }
+  .suggest-row:last-child{border-bottom:none;}
+  .suggest-row .info{font-size:13px;}
+  .suggest-row .info .n{color:var(--sub); font-size:12px;}
+  .dup-group{border-bottom:1px solid var(--line); padding:10px 0;}
+  .dup-group:last-child{border-bottom:none;}
+  .dup-group .url{font-size:11.5px; color:var(--sub); word-break:break-all; margin-bottom:6px;}
+  .dup-group .item{display:flex; align-items:center; gap:6px; font-size:12.5px; padding:3px 0;}
+  .modal h3{margin:0 0 12px; font-size:15px;}
+  .modal input[type=text]{
+    width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px; font-size:13.5px; outline:none;
+    background:var(--bg); color:var(--ink);
+  }
+  .modal input[type=text]:focus{border-color:var(--accent);}
+  .modal p{font-size:13px; color:var(--sub); line-height:1.5; margin:0 0 6px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+
+  .toast{
+    position:fixed; left:50%; top:18px; transform:translateX(-50%) translateY(-140%);
+    background:#1c1b19; color:#fff; padding:9px 16px; border-radius:9px; font-size:12.5px;
+    z-index:60; transition:transform .18s ease; box-shadow:0 8px 20px rgba(0,0,0,.2);
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  .banner{
+    background:#fff7ec; border-bottom:1px solid #f0e2c8; color:#6b5a2e; font-size:12.5px;
+    padding:8px 20px; display:flex; align-items:center; gap:8px; flex-shrink:0;
+  }
+  .banner strong{font-weight:700;}
+  .banner .close{margin-left:auto; cursor:pointer; color:#8a7845; font-size:12px;}
+  .banner.error{background:#fdeceb; border-color:#f3c8c4; color:#8a2f27;}
+
+  /* ---------- Toolbar filter/sort/appearance ---------- */
+  .toolbar-select{
+    border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    padding:7px 10px; border-radius:9px; font-size:12.5px; cursor:pointer; flex-shrink:0;
+  }
+  .appearance-wrap{position:relative;}
+  .appearance-popover{
+    position:absolute; top:calc(100% + 6px); right:0; background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.15); padding:14px; width:210px; z-index:40;
+  }
+  .appearance-popover .field-label{font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:var(--sub); margin-bottom:6px;}
+  .size-toggle{display:flex; gap:6px; margin-bottom:14px;}
+  .size-toggle button{
+    flex:1; padding:6px 0; border:1px solid var(--line); background:var(--bg); color:var(--ink);
+    border-radius:7px; font-size:12px; cursor:pointer;
+  }
+  .size-toggle button.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .dark-toggle-row{display:flex; align-items:center; justify-content:space-between; font-size:13px;}
+  .switch{position:relative; width:36px; height:20px; flex-shrink:0;}
+  .switch input{opacity:0; width:0; height:0;}
+  .switch .slider{
+    position:absolute; inset:0; background:var(--line); border-radius:20px; cursor:pointer; transition:.15s;
+  }
+  .switch .slider::before{
+    content:""; position:absolute; width:16px; height:16px; left:2px; top:2px; background:#fff; border-radius:50%; transition:.15s;
+  }
+  .switch input:checked + .slider{background:var(--accent);}
+  .switch input:checked + .slider::before{transform:translateX(16px);}
+
+  /* ---------- Grid size variants ---------- */
+  .grid.size-sm{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px;}
+  .grid.size-md{grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px;}
+  .grid.size-lg{grid-template-columns:repeat(auto-fill, minmax(270px, 1fr)); gap:20px;}
+
+  /* ---------- Dead-link / duplicate badges ---------- */
+  .card-thumb .dead-badge{
+    position:absolute; bottom:6px; left:6px; background:rgba(198,40,40,.92); color:#fff;
+    font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600;
+  }
+  .card-thumb .dup-badge{
+    position:absolute; bottom:6px; left:6px; background:rgba(124,58,237,.92); color:#fff;
+    font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600;
+  }
+  .scan-progress{font-size:11.5px; color:var(--sub); white-space:nowrap;}
+
+  /* ---------- Dark theme ---------- */
+  [data-theme="dark"]{
+    --bg:#171614; --panel:#221f1c; --ink:#f1efe9; --sub:#a39e93; --line:#38352d;
+    --card-shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.35);
+    --card-shadow-hover: 0 4px 10px rgba(0,0,0,.5), 0 14px 28px rgba(0,0,0,.5);
+  }
+  [data-theme="dark"] .tree-item.active{background:#3d2a22; color:#ff8a65;}
+  [data-theme="dark"] .tree-item.active .count{background:#4d3128; color:#ff8a65;}
+  [data-theme="dark"] .card-thumb{background:#2a2822;}
+  [data-theme="dark"] .card-thumb.generic .favicon-big{background:#332f28;}
+  [data-theme="dark"] .banner:not(.error){background:#2b2410; border-color:#4a3d1a; color:#e0c477;}
+  [data-theme="dark"] .empty-state{color:var(--sub);}
+  [data-theme="dark"] .size-toggle button{background:var(--bg);}
+</style>
+</head>
+<body>
+
+  <div class="banner" id="banner" style="display:none;">
+    <span id="bannerText"></span>
+    <span class="close" id="bannerClose">✕</span>
+  </div>
+
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>书签整理台</div>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="搜索标题或网址...">
+    </div>
+    <select class="toolbar-select" id="typeFilter" title="按类型筛选">
+      <option value="all">全部类型</option>
+      <option value="youtube">YouTube</option>
+      <option value="other">其他网站</option>
+    </select>
+    <select class="toolbar-select" id="sortSelect" title="排序方式">
+      <option value="date_desc">最近添加</option>
+      <option value="date_asc">最早添加</option>
+      <option value="title_asc">标题 A→Z</option>
+      <option value="title_desc">标题 Z→A</option>
+    </select>
+    <div class="topbar-actions">
+      <span class="scan-progress" id="scanProgress"></span>
+      <button class="btn ghost small" id="groupSuggestBtn">智能分组</button>
+      <button class="btn ghost small" id="deadLinkBtn">检查失效链接</button>
+      <button class="btn ghost small" id="refreshBtn">刷新</button>
+      <button class="btn ghost small" id="saveJsonBtn">导出备份(JSON)</button>
+      <div class="appearance-wrap">
+        <button class="btn ghost small" id="appearanceBtn">⚙ 外观</button>
+        <div class="appearance-popover" id="appearancePopover" style="display:none;">
+          <div class="field-label">卡片大小</div>
+          <div class="size-toggle" id="sizeToggle">
+            <button data-size="sm">小</button>
+            <button data-size="md">中</button>
+            <button data-size="lg">大</button>
+          </div>
+          <div class="dark-toggle-row">
+            <span>深色模式</span>
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section-title">视图</div>
+      <div id="virtualViews"></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-title">文件夹</div>
+      <div id="folderTree"></div>
+      <div class="new-folder-btn" id="newFolderBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+        新建文件夹
+      </div>
+      <div class="trash-zone" id="trashZone">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0-1 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 6"/></svg>
+        拖到这里删除
+      </div>
+    </div>
+
+    <div class="main" id="main">
+      <div class="main-header">
+        <h1 id="mainTitle">全部书签</h1>
+        <span class="sub" id="mainSub"></span>
+        <button class="btn small ghost" id="autoSelectDupBtn" style="display:none;margin-left:auto;">选中所有多余重复项</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="big">📭</div>
+        <div>这里还没有书签</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="selection-bar" id="selectionBar">
+    <span class="count" id="selectionCount">已选择 0 项</span>
+    <select id="moveSelect"></select>
+    <button class="btn small" id="moveBtn">移动</button>
+    <button class="btn small danger" id="deleteSelectedBtn">删除</button>
+    <button class="btn small ghost" id="clearSelectionBtn" style="background:transparent;color:#cfcdc8;">取消选择</button>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalBox"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script src="newtab.js"></script>
+</body>
+</html>
