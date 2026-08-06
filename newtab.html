@@ -82,6 +82,13 @@
   .tree-children{margin-left:16px;}
   .tree-children.collapsed{display:none;}
   .sidebar-divider{height:1px; background:var(--line); margin:10px 6px;}
+  .site-search{padding:0 6px 6px;}
+  .site-search input{
+    width:100%; padding:6px 9px; border:1px solid var(--line); border-radius:8px; font-size:12.5px;
+    background:var(--bg); color:var(--ink); outline:none;
+  }
+  .site-search input:focus{border-color:var(--accent);}
+  .site-list{max-height:220px; overflow-y:auto; margin-bottom:4px;}
   .new-folder-btn{
     display:flex; align-items:center; gap:6px; padding:8px 10px; margin:2px 4px;
     font-size:13px; color:var(--sub); border-radius:8px; cursor:pointer; border:1px dashed var(--line);
@@ -344,6 +351,12 @@
     <div class="sidebar" id="sidebar">
       <div class="sidebar-section-title" data-i18n="viewsLabel">视图</div>
       <div id="virtualViews"></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-title" data-i18n="sitesLabel">网站</div>
+      <div class="site-search">
+        <input id="siteSearchInput" type="text" data-i18n-placeholder="siteSearchPlaceholder" placeholder="筛选网站...">
+      </div>
+      <div id="siteList" class="site-list"></div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-section-title" data-i18n="foldersLabel">文件夹</div>
       <div id="folderTree"></div>

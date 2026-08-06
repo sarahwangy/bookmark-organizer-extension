@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Bookmark Organizer",
+    "description": "Extension name shown in chrome://extensions and the Web Store"
+  },
+  "extDescription": {
+    "message": "Magazine-style bookmark manager: replaces the new tab page, YouTube thumbnail previews, multi-select + drag-and-drop into folders, reads and writes your real Chrome bookmarks directly.",
+    "description": "Extension description shown in chrome://extensions and the Web Store"
+  }
+}

@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "书签整理台",
+  "name": "__MSG_extName__",
   "version": "1.0.0",
-  "description": "杂志卡片式书签管理器：替换新标签页，YouTube 缩略图预览，多选 + 拖拽把书签整理进文件夹，直接读写 Chrome 真实书签。",
+  "description": "__MSG_extDescription__",
+  "default_locale": "zh_CN",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },

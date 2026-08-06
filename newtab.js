@@ -23,6 +23,8 @@
       sizeSm: '小', sizeMd: '中', sizeLg: '大',
       darkModeLabel: '深色模式',
       viewsLabel: '视图',
+      sitesLabel: '网站',
+      siteSearchPlaceholder: '筛选网站...',
       foldersLabel: '文件夹',
       newFolderBtn: '新建文件夹',
       trashZone: '拖到这里删除',
@@ -90,6 +92,8 @@
       sizeSm: 'Small', sizeMd: 'Medium', sizeLg: 'Large',
       darkModeLabel: 'Dark Mode',
       viewsLabel: 'Views',
+      sitesLabel: 'Sites',
+      siteSearchPlaceholder: 'Filter sites...',
       foldersLabel: 'Folders',
       newFolderBtn: 'New Folder',
       trashZone: 'Drag here to delete',
@@ -174,6 +178,7 @@
     selection: new Set(),
     lastClickedId: null,
     searchQuery: '',
+    siteFilterQuery: '',
     collapsed: new Set(),
     typeFilter: 'all',       // all | youtube | other
     sort: 'date_desc',       // date_desc | date_asc | title_asc | title_desc
@@ -273,6 +278,17 @@
     const groups = [];
     map.forEach((items) => { if(items.length > 1) groups.push({items}); });
     return groups;
+  }
+  function computeSiteCounts(){
+    const byDomain = new Map();
+    allBookmarks(state.tree).forEach(({node}) => {
+      const d = domainOf(node.url);
+      if(!d) return;
+      byDomain.set(d, (byDomain.get(d) || 0) + 1);
+    });
+    return Array.from(byDomain.entries())
+      .map(([domain, count]) => ({domain, count}))
+      .sort((a,b) => b.count - a.count || a.domain.localeCompare(b.domain));
   }
   function computeGroupSuggestions(){
     const byDomain = new Map();
@@ -427,6 +443,21 @@
     walk(state.tree, 0);
   }
 
+  const siteListEl = document.getElementById('siteList');
+  function renderSiteList(){
+    const q = state.siteFilterQuery.trim().toLowerCase();
+    let sites = computeSiteCounts();
+    if(q) sites = sites.filter(s => s.domain.toLowerCase().includes(q));
+    siteListEl.innerHTML = '';
+    sites.forEach(s => {
+      siteListEl.appendChild(makeTreeRow({
+        label: '🌐 ' + s.domain,
+        count: s.count,
+        view: 'site:' + s.domain,
+      }));
+    });
+  }
+
   function currentBookmarks(){
     const q = state.searchQuery.trim().toLowerCase();
     let items;
@@ -441,6 +472,11 @@
       const fid = state.currentView.slice(7);
       const f = findNode(state.tree, fid);
       items = f ? f.children.filter(c => c.type === 'bookmark').map(n => ({node:n, path:null})) : [];
+    } else if(state.currentView.startsWith('site:')){
+      const domain = state.currentView.slice(5);
+      items = allBookmarks(state.tree)
+        .filter(x => domainOf(x.node.url) === domain)
+        .map(x => ({node:x.node, path: x.path.join(' / ')}));
     } else {
       items = [];
     }
@@ -464,6 +500,8 @@
       const fid = state.currentView.slice(7);
       const f = findNode(state.tree, fid);
       mainTitleEl.textContent = f ? ('📁 ' + f.title) : '';
+    } else if(state.currentView.startsWith('site:')){
+      mainTitleEl.textContent = '🌐 ' + state.currentView.slice(5);
     }
     const items = currentBookmarks();
     mainSubEl.textContent = items.length + t('itemsSuffix') + (state.searchQuery ? t('filteredSuffix') : '');
@@ -623,6 +661,7 @@
 
   function render(){
     renderVirtualViews();
+    renderSiteList();
     renderFolderTree();
     renderMainHeader();
     renderGrid();
@@ -734,6 +773,10 @@
   document.getElementById('searchInput').addEventListener('input', (e) => {
     state.searchQuery = e.target.value;
     render();
+  });
+  document.getElementById('siteSearchInput').addEventListener('input', (e) => {
+    state.siteFilterQuery = e.target.value;
+    renderSiteList();
   });
   document.getElementById('typeFilter').addEventListener('change', (e) => {
     state.typeFilter = e.target.value;
