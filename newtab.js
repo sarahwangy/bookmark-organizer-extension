@@ -561,6 +561,16 @@
       note.textContent = opts.note;
       section.appendChild(note);
     }
+    if(opts.legend && opts.legend.length){
+      const legend = document.createElement('div');
+      legend.className = 'stack-legend bar-legend';
+      opts.legend.forEach(({label, color}) => {
+        const item = document.createElement('span');
+        item.innerHTML = '<span class="dot" style="background:' + color + '"></span>' + escapeHtml(label);
+        legend.appendChild(item);
+      });
+      section.appendChild(legend);
+    }
     if(!items.length){
       const hint = document.createElement('div');
       hint.className = 'empty-hint';
@@ -582,6 +592,7 @@
       const fill = document.createElement('div');
       fill.className = 'bar-fill';
       fill.style.width = Math.max(2, (count / maxCount) * 100) + '%';
+      if(item.color) fill.style.background = item.color;
       track.appendChild(fill);
       const c = document.createElement('span');
       c.className = 'bar-count';
@@ -688,14 +699,18 @@
       }
     ));
 
+    const yearColorMap = {};
+    a.years.forEach(([y], i) => { yearColorMap[y] = PIE_COLORS[i % PIE_COLORS.length]; });
+    const monthYearsShown = Array.from(new Set(a.months.map(([ym]) => ym.slice(0, 4))));
     el.appendChild(buildBarSection(
       t('sectionMonthly'),
-      a.months.map(([ym, count]) => ({label: ym, count, ym})),
+      a.months.map(([ym, count]) => ({label: ym, count, ym, color: yearColorMap[ym.slice(0, 4)]})),
       {
         note: [
           a.peakMonth ? t('peakMonthNote', a.peakMonth[0], a.peakMonth[1]) : null,
           a.monthsTruncated ? t('monthlyTruncated', a.monthsTotal) : null,
         ].filter(Boolean).join(' · ') || null,
+        legend: monthYearsShown.map(y => ({label: y, color: yearColorMap[y]})),
         onClick: item => goToFilteredView({view: 'month:' + item.ym}),
       }
     ));
