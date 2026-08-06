@@ -548,55 +548,6 @@
     return section;
   }
 
-  function buildColumnChart(title, items, opts){
-    opts = opts || {};
-    const section = document.createElement('div');
-    section.className = 'analytics-section';
-    const h = document.createElement('h3');
-    h.textContent = title;
-    section.appendChild(h);
-    if(opts.note){
-      const note = document.createElement('div');
-      note.className = 'analytics-note';
-      note.textContent = opts.note;
-      section.appendChild(note);
-    }
-    if(!items.length){
-      const hint = document.createElement('div');
-      hint.className = 'empty-hint';
-      hint.textContent = t('noData');
-      section.appendChild(hint);
-      return section;
-    }
-    const maxCount = Math.max(...items.map(i => i.count), 1);
-    const chart = document.createElement('div');
-    chart.className = 'column-chart';
-    items.forEach(item => {
-      const {label, count} = item;
-      const col = document.createElement('div');
-      col.className = 'col' + (opts.onClick ? ' clickable' : '');
-      const cnt = document.createElement('div');
-      cnt.className = 'col-count';
-      cnt.textContent = count;
-      const barWrap = document.createElement('div');
-      barWrap.className = 'col-bar-wrap';
-      const barEl = document.createElement('div');
-      barEl.className = 'col-bar';
-      barEl.style.height = Math.max(3, (count / maxCount) * 120) + 'px';
-      barWrap.appendChild(barEl);
-      const lbl = document.createElement('div');
-      lbl.className = 'col-label';
-      lbl.textContent = label;
-      col.appendChild(cnt);
-      col.appendChild(barWrap);
-      col.appendChild(lbl);
-      if(opts.onClick) col.addEventListener('click', () => opts.onClick(item));
-      chart.appendChild(col);
-    });
-    section.appendChild(chart);
-    return section;
-  }
-
   function buildBarSection(title, items, opts){
     opts = opts || {};
     const section = document.createElement('div');
@@ -737,7 +688,7 @@
       }
     ));
 
-    el.appendChild(buildColumnChart(
+    el.appendChild(buildBarSection(
       t('sectionMonthly'),
       a.months.map(([ym, count]) => ({label: ym, count, ym})),
       {
