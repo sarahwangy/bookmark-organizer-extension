@@ -19,6 +19,9 @@
       refreshBtn: '刷新',
       saveJsonBtn: '导出备份(JSON)',
       appearanceBtn: '⚙ 外观',
+      viewModeLabel: '显示方式',
+      viewModeGrid: '卡片',
+      viewModeList: '列表',
       cardSizeLabel: '卡片大小',
       sizeSm: '小', sizeMd: '中', sizeLg: '大',
       darkModeLabel: '深色模式',
@@ -88,6 +91,9 @@
       refreshBtn: 'Refresh',
       saveJsonBtn: 'Export Backup (JSON)',
       appearanceBtn: '⚙ Appearance',
+      viewModeLabel: 'Display',
+      viewModeGrid: 'Cards',
+      viewModeList: 'List',
       cardSizeLabel: 'Card Size',
       sizeSm: 'Small', sizeMd: 'Medium', sizeLg: 'Large',
       darkModeLabel: 'Dark Mode',
@@ -183,6 +189,7 @@
     typeFilter: 'all',       // all | youtube | other
     sort: 'date_desc',       // date_desc | date_asc | title_asc | title_desc
     cardSize: 'md',          // sm | md | lg
+    viewMode: 'grid',        // grid | list
     darkMode: false,
     deadIds: new Set(),
     lang: detectDefaultLang(),
@@ -649,16 +656,149 @@
     return card;
   }
 
+  function renderListRow({node, path, dupCount}){
+    const row = document.createElement('div');
+    row.className = 'list-row' + (state.selection.has(node.id) ? ' selected' : '');
+    row.draggable = true;
+    row.dataset.id = node.id;
+
+    const selBox = document.createElement('div');
+    selBox.className = 'list-select';
+    selBox.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>';
+    selBox.addEventListener('click', (e) => { e.stopPropagation(); toggleSelect(node.id); });
+    row.appendChild(selBox);
+
+    const thumb = document.createElement('div');
+    thumb.className = 'list-thumb';
+    const ytId = getYouTubeId(node.url);
+    if(ytId){
+      const img = document.createElement('img');
+      img.className = 'thumb-img';
+      img.loading = 'lazy';
+      img.src = 'https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg';
+      img.alt = '';
+      thumb.appendChild(img);
+      const play = document.createElement('div');
+      play.className = 'yt-play';
+      play.innerHTML = '<svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>';
+      thumb.appendChild(play);
+    } else {
+      thumb.style.backgroundImage = gradientFor(domainOf(node.url));
+      const favWrap = document.createElement('div');
+      favWrap.className = 'favicon-big';
+      const favImg = document.createElement('img');
+      favImg.loading = 'lazy';
+      favImg.src = faviconUrl(node.url);
+      favImg.alt = '';
+      favImg.onerror = function(){
+        this.remove();
+        const letter = document.createElement('span');
+        letter.className = 'fallback-letter';
+        letter.textContent = (domainOf(node.url)[0] || '?').toUpperCase();
+        favWrap.appendChild(letter);
+      };
+      favWrap.appendChild(favImg);
+      thumb.appendChild(favWrap);
+    }
+    row.appendChild(thumb);
+
+    const body = document.createElement('div');
+    body.className = 'list-body';
+    const title = document.createElement('div');
+    title.className = 'list-title';
+    title.textContent = node.title || node.url;
+    body.appendChild(title);
+    const meta = document.createElement('div');
+    meta.className = 'list-meta';
+    meta.textContent = node.url + (path ? ('  ·  ' + path) : '');
+    body.appendChild(meta);
+    row.appendChild(body);
+
+    if(state.deadIds.has(node.id)){
+      const badge = document.createElement('span');
+      badge.className = 'list-badge dead';
+      badge.textContent = t('deadBadge');
+      row.appendChild(badge);
+    } else if(dupCount && dupCount > 1){
+      const badge = document.createElement('span');
+      badge.className = 'list-badge dup';
+      badge.textContent = t('dupBadge', dupCount);
+      row.appendChild(badge);
+    }
+
+    const dateEl = document.createElement('span');
+    dateEl.className = 'list-date';
+    dateEl.textContent = node.dateAdded ? new Date(node.dateAdded).toLocaleDateString() : '';
+    row.appendChild(dateEl);
+
+    const openBtn = document.createElement('a');
+    openBtn.className = 'list-open';
+    openBtn.href = node.url;
+    openBtn.target = '_blank';
+    openBtn.rel = 'noopener noreferrer';
+    openBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>';
+    openBtn.addEventListener('click', (e) => e.stopPropagation());
+    row.appendChild(openBtn);
+
+    row.addEventListener('click', (e) => {
+      if(e.shiftKey && state.lastClickedId){
+        rangeSelect(state.lastClickedId, node.id);
+      } else if(e.ctrlKey || e.metaKey){
+        toggleSelect(node.id);
+      } else if(state.selection.size > 0){
+        toggleSelect(node.id);
+      } else {
+        window.open(node.url, '_blank', 'noopener,noreferrer');
+      }
+    });
+
+    row.addEventListener('dragstart', (e) => {
+      if(!state.selection.has(node.id)){
+        state.selection = new Set([node.id]);
+        renderSelectionUI();
+      }
+      row.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', JSON.stringify(Array.from(state.selection)));
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', () => row.classList.remove('dragging'));
+
+    return row;
+  }
+
   function renderGrid(){
-    gridEl.className = 'grid size-' + state.cardSize;
     const items = currentBookmarks();
     gridEl.innerHTML = '';
     if(items.length === 0){
       emptyStateEl.style.display = 'flex';
+      gridEl.className = state.viewMode === 'list' ? 'list' : ('grid size-' + state.cardSize);
       return;
     }
     emptyStateEl.style.display = 'none';
-    items.forEach(item => gridEl.appendChild(renderCard(item)));
+
+    if(state.viewMode === 'list'){
+      gridEl.className = 'list';
+      const groups = new Map();
+      items.forEach(item => {
+        const d = domainOf(item.node.url) || '';
+        if(!groups.has(d)) groups.set(d, []);
+        groups.get(d).push(item);
+      });
+      Array.from(groups.keys()).sort((a,b) => a.localeCompare(b)).forEach(domain => {
+        const groupItems = groups.get(domain);
+        const groupEl = document.createElement('div');
+        groupEl.className = 'list-group';
+        const title = document.createElement('div');
+        title.className = 'list-group-title';
+        title.textContent = (domain || '—').toUpperCase() + ' (' + groupItems.length + ')';
+        groupEl.appendChild(title);
+        groupItems.forEach(item => groupEl.appendChild(renderListRow(item)));
+        gridEl.appendChild(groupEl);
+      });
+    } else {
+      gridEl.className = 'grid size-' + state.cardSize;
+      items.forEach(item => gridEl.appendChild(renderCard(item)));
+    }
   }
 
   function renderMoveSelect(){
@@ -673,7 +813,7 @@
   }
 
   function renderSelectionUI(){
-    document.querySelectorAll('.card').forEach(c => {
+    document.querySelectorAll('.card, .list-row').forEach(c => {
       c.classList.toggle('selected', state.selection.has(c.dataset.id));
     });
     const bar = document.getElementById('selectionBar');
@@ -889,6 +1029,17 @@
       renderGrid();
     });
   });
+  function updateViewModeToggleUI(){
+    document.querySelectorAll('#viewModeToggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === state.viewMode));
+  }
+  document.querySelectorAll('#viewModeToggle button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.viewMode = b.dataset.mode;
+      localStorage.setItem('bm_view_mode', state.viewMode);
+      updateViewModeToggleUI();
+      renderGrid();
+    });
+  });
   const darkToggle = document.getElementById('darkModeToggle');
   darkToggle.addEventListener('change', () => {
     state.darkMode = darkToggle.checked;
@@ -1023,10 +1174,12 @@
 
   /* ================= Init ================= */
   state.cardSize = localStorage.getItem('bm_card_size') || 'md';
+  state.viewMode = localStorage.getItem('bm_view_mode') === 'list' ? 'list' : 'grid';
   state.darkMode = localStorage.getItem('bm_dark') === '1';
   document.documentElement.setAttribute('data-theme', state.darkMode ? 'dark' : '');
   darkToggle.checked = state.darkMode;
   updateSizeToggleUI();
+  updateViewModeToggleUI();
   applyStaticI18n();
   doReload();
 })();

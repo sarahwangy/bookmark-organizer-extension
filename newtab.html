@@ -277,6 +277,51 @@
   .grid.size-md{grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px;}
   .grid.size-lg{grid-template-columns:repeat(auto-fill, minmax(270px, 1fr)); gap:20px;}
 
+  /* ---------- List view ---------- */
+  .list-group{margin-bottom:22px;}
+  .list-group-title{
+    font-size:11px; font-weight:700; letter-spacing:.6px; color:var(--sub); text-transform:uppercase;
+    margin:0 0 8px 2px;
+  }
+  .list-row{
+    display:flex; align-items:center; gap:12px; background:var(--panel); border-radius:12px;
+    padding:8px 12px; margin-bottom:8px; box-shadow:var(--card-shadow); border:2px solid transparent;
+    cursor:pointer; transition:border-color .12s ease, box-shadow .12s ease;
+  }
+  .list-row:hover{box-shadow:var(--card-shadow-hover);}
+  .list-row.selected{border-color:var(--accent);}
+  .list-row.dragging{opacity:.4;}
+  .list-select{
+    width:20px; height:20px; border-radius:6px; background:#fff; flex-shrink:0;
+    border:1.5px solid #d8d5cc; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .list-row.selected .list-select{background:var(--accent); border-color:var(--accent);}
+  .list-select svg{display:none;}
+  .list-row.selected .list-select svg{display:block;}
+  .list-thumb{
+    width:72px; height:44px; border-radius:8px; overflow:hidden; flex-shrink:0; position:relative;
+    background:#eeece6; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center;
+  }
+  .list-thumb img.thumb-img{width:100%; height:100%; object-fit:cover; display:block;}
+  .list-thumb .favicon-big{width:22px; height:22px; border-radius:6px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.15); display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .list-thumb .favicon-big img{width:13px; height:13px;}
+  .list-thumb .favicon-big .fallback-letter{font-size:10px; font-weight:700; color:#fff;}
+  .list-thumb .yt-play{position:absolute; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; pointer-events:none;}
+  .list-thumb .yt-play svg{width:9px; height:9px; margin-left:1px;}
+  .list-body{flex:1; min-width:0;}
+  .list-title{font-size:13px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .list-meta{font-size:11.5px; color:var(--sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;}
+  .list-date{font-size:11.5px; color:var(--sub); flex-shrink:0; white-space:nowrap;}
+  .list-open{
+    width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    color:var(--sub); opacity:0; transition:opacity .12s ease, background .12s ease;
+  }
+  .list-row:hover .list-open{opacity:1;}
+  .list-open:hover{background:var(--bg); color:var(--ink);}
+  .list-badge{font-size:10px; font-weight:600; padding:2px 6px; border-radius:4px; flex-shrink:0;}
+  .list-badge.dead{background:rgba(198,40,40,.12); color:#c62828;}
+  .list-badge.dup{background:rgba(124,58,237,.12); color:#7c3aed;}
+
   /* ---------- Dead-link / duplicate badges ---------- */
   .card-thumb .dead-badge{
     position:absolute; bottom:6px; left:6px; background:rgba(198,40,40,.92); color:#fff;
@@ -298,6 +343,9 @@
   [data-theme="dark"] .tree-item.active .count{background:#4d3128; color:#ff8a65;}
   [data-theme="dark"] .card-thumb{background:#2a2822;}
   [data-theme="dark"] .card-thumb.generic .favicon-big{background:#332f28;}
+  [data-theme="dark"] .list-thumb{background:#2a2822;}
+  [data-theme="dark"] .list-thumb .favicon-big{background:#332f28;}
+  [data-theme="dark"] .list-select{background:#221f1c; border-color:#46443f;}
   [data-theme="dark"] .banner:not(.error){background:#2b2410; border-color:#4a3d1a; color:#e0c477;}
   [data-theme="dark"] .empty-state{color:var(--sub);}
   [data-theme="dark"] .size-toggle button{background:var(--bg);}
@@ -337,6 +385,11 @@
       <div class="appearance-wrap">
         <button class="btn ghost small" id="appearanceBtn" data-i18n="appearanceBtn">⚙ 外观</button>
         <div class="appearance-popover" id="appearancePopover" style="display:none;">
+          <div class="field-label" data-i18n="viewModeLabel">显示方式</div>
+          <div class="size-toggle" id="viewModeToggle">
+            <button data-mode="grid" data-i18n="viewModeGrid">卡片</button>
+            <button data-mode="list" data-i18n="viewModeList">列表</button>
+          </div>
           <div class="field-label" data-i18n="cardSizeLabel">卡片大小</div>
           <div class="size-toggle" id="sizeToggle">
             <button data-size="sm" data-i18n="sizeSm">小</button>
