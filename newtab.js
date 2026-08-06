@@ -14,11 +14,9 @@
       sortDateAsc: '最早添加',
       sortTitleAsc: '标题 A→Z',
       sortTitleDesc: '标题 Z→A',
-      yearFilterTitle: '按年份筛选',
-      monthFilterTitle: '按月份筛选',
-      allYears: '全部年份',
-      allMonths: '全部月份',
-      monthNames: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+      dateFromTitle: '起始年月',
+      dateToTitle: '结束年月',
+      dateRangeClear: '×',
       groupSuggestBtn: '智能分组',
       deadLinkBtn: '检查失效链接',
       refreshBtn: '刷新',
@@ -43,6 +41,41 @@
       clearSelectionBtn: '取消选择',
       allBookmarks: '📚 全部书签',
       duplicates: '🔁 重复书签',
+      analyticsViewLabel: '📊 分析',
+      analyticsSubtitle: '基于全部书签生成',
+      exportCsvBtn: '导出 CSV 报告',
+      unsortedLabel: '未分类',
+      noData: '暂无数据',
+      other: '其他',
+      statTotal: '书签总数',
+      statDomains: '不同网站数',
+      statFolders: '文件夹数',
+      statDupExtra: '多余重复项',
+      sectionCategory: '内容主题分布',
+      sectionYtRatio: 'YouTube / 其他网站占比',
+      sectionTopDomains: '热门域名 Top 10',
+      sectionFolders: '文件夹分布',
+      sectionMonthly: '按月添加趋势',
+      sectionSuggestions: '整理建议',
+      monthlyTruncated: n => '只显示最近 24 个月（共 ' + n + ' 个月有记录）',
+      analyticsNote: '主题分类基于本地关键词匹配，完全在你的浏览器里计算，不调用任何 AI 接口，不需要 API Key，也不会有任何数据离开你的浏览器。',
+      cat_work: '求职 / 工作',
+      cat_ai_tech: 'AI / 技术',
+      cat_video: '视频 / 影音',
+      cat_music: '音乐',
+      cat_shopping: '购物',
+      cat_social: '社交媒体',
+      cat_news: '新闻',
+      cat_reference: '文档 / 参考资料',
+      cat_health: '健康 / 健身',
+      cat_other: '其他',
+      suggestionDup: n => '你有 ' + n + ' 个多余的重复书签，可以在"重复书签"视图里一键清理。',
+      suggestionGroup: (n, domain) => '有 ' + n + ' 个网站的书签分散在不同文件夹（比如 ' + domain + '），试试顶部的"智能分组"一键归类。',
+      suggestionBigFolder: (name, count) => '"' + name + '" 文件夹里堆了 ' + count + ' 条书签，占了一半以上，可能需要再拆分整理。',
+      suggestionManyUncategorized: n => '有 ' + n + ' 条书签没能自动归类，内容比较杂，可以自己看看有没有可以删除的。',
+      suggestionNone: '书签整理得不错，暂时没有发现明显需要处理的问题。',
+      csvTitle: '标题', csvUrl: '网址', csvDomain: '域名', csvCategory: '分类', csvFolder: '文件夹路径', csvDate: '添加日期',
+      csvExported: '已导出 CSV 报告',
       unnamedFolder: '未命名文件夹',
       itemsSuffix: ' 项',
       filteredSuffix: '（已按条件筛选）',
@@ -91,11 +124,9 @@
       sortDateAsc: 'Oldest First',
       sortTitleAsc: 'Title A→Z',
       sortTitleDesc: 'Title Z→A',
-      yearFilterTitle: 'Filter by year',
-      monthFilterTitle: 'Filter by month',
-      allYears: 'All Years',
-      allMonths: 'All Months',
-      monthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      dateFromTitle: 'From (year-month)',
+      dateToTitle: 'To (year-month)',
+      dateRangeClear: '×',
       groupSuggestBtn: 'Smart Group',
       deadLinkBtn: 'Check Dead Links',
       refreshBtn: 'Refresh',
@@ -120,6 +151,41 @@
       clearSelectionBtn: 'Clear Selection',
       allBookmarks: '📚 All Bookmarks',
       duplicates: '🔁 Duplicates',
+      analyticsViewLabel: '📊 Analytics',
+      analyticsSubtitle: 'Based on all bookmarks',
+      exportCsvBtn: 'Export CSV Report',
+      unsortedLabel: 'Unsorted',
+      noData: 'No data',
+      other: 'Other',
+      statTotal: 'Total Bookmarks',
+      statDomains: 'Distinct Sites',
+      statFolders: 'Folders',
+      statDupExtra: 'Extra Duplicates',
+      sectionCategory: 'Content Topic Distribution',
+      sectionYtRatio: 'YouTube vs. Other Sites',
+      sectionTopDomains: 'Top 10 Domains',
+      sectionFolders: 'Folder Distribution',
+      sectionMonthly: 'Bookmarks Added Per Month',
+      sectionSuggestions: 'Cleanup Suggestions',
+      monthlyTruncated: n => 'Showing the most recent 24 months (' + n + ' months total have data)',
+      analyticsNote: 'Topic classification runs on local keyword matching entirely inside your browser — no AI API is called, no API key is needed, and no data ever leaves your browser.',
+      cat_work: 'Work & Career',
+      cat_ai_tech: 'AI & Tech',
+      cat_video: 'Video & Entertainment',
+      cat_music: 'Music',
+      cat_shopping: 'Shopping',
+      cat_social: 'Social Media',
+      cat_news: 'News',
+      cat_reference: 'Docs & Reference',
+      cat_health: 'Health & Fitness',
+      cat_other: 'Other',
+      suggestionDup: n => 'You have ' + n + ' extra duplicate bookmarks — clean them up from the Duplicates view.',
+      suggestionGroup: (n, domain) => n + ' sites have bookmarks scattered across folders (e.g. ' + domain + ') — try Smart Group in the toolbar.',
+      suggestionBigFolder: (name, count) => '"' + name + '" holds ' + count + ' bookmarks — over half your total — consider splitting it up.',
+      suggestionManyUncategorized: n => n + ' bookmarks didn\'t match any known category — worth a manual look for cleanup candidates.',
+      suggestionNone: 'Looking tidy — no obvious cleanup needed right now.',
+      csvTitle: 'Title', csvUrl: 'URL', csvDomain: 'Domain', csvCategory: 'Category', csvFolder: 'Folder Path', csvDate: 'Date Added',
+      csvExported: 'CSV report exported',
       unnamedFolder: 'Untitled Folder',
       itemsSuffix: ' items',
       filteredSuffix: ' (filtered)',
@@ -174,7 +240,6 @@
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
     document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
-    renderMonthFilterOptions();
   }
 
   if(!(window.chrome && chrome.bookmarks)){
@@ -198,8 +263,8 @@
     siteFilterQuery: '',
     collapsed: new Set(),
     typeFilter: 'all',       // all | youtube | other
-    yearFilter: 'all',       // all | '2026'
-    monthFilter: 'all',      // all | 1-12
+    dateFrom: '',            // '' | 'YYYY-MM'
+    dateTo: '',              // '' | 'YYYY-MM'
     sort: 'date_desc',       // date_desc | date_asc | title_asc | title_desc
     cardSize: 'md',          // sm | md | lg
     viewMode: 'grid',        // grid | list
@@ -329,6 +394,259 @@
     suggestions.sort((a,b) => b.count - a.count);
     return suggestions.slice(0, 12);
   }
+
+  /* ================= Analytics ================= */
+  const CATEGORY_RULES = [
+    {key:'work', domains:['linkedin.com','indeed.com','glassdoor.com','ziprecruiter.com'], keywords:['职位','招聘','简历','面试','求职','工作','job','career','resume','interview','hiring','recruit']},
+    {key:'ai_tech', domains:['github.com','gitlab.com','stackoverflow.com','npmjs.com','developer.mozilla.org','claude.ai','openai.com','chatgpt.com','vercel.com','anthropic.com'], keywords:['ai','gpt','claude','llm','api','sdk','代码','编程','开发','技术','人工智能','machine learning','docs','documentation','developer','programming']},
+    {key:'video', domains:['youtube.com','youtu.be','netflix.com','bilibili.com','twitch.tv'], keywords:['视频','电影','剧集','tutorial']},
+    {key:'music', domains:['spotify.com','music.youtube.com','music.apple.com','soundcloud.com'], keywords:['音乐','music','歌曲','playlist']},
+    {key:'shopping', domains:['amazon.com','taobao.com','tmall.com','jd.com','ebay.com'], keywords:['购物','商城','淘宝','deal','price','buy','shopping']},
+    {key:'social', domains:['twitter.com','x.com','facebook.com','instagram.com','reddit.com','weibo.com','threads.net'], keywords:[]},
+    {key:'news', domains:['cnn.com','bbc.com','nytimes.com','reuters.com'], keywords:['新闻','news']},
+    {key:'reference', domains:['wikipedia.org','medium.com','substack.com','notion.so'], keywords:['wiki','文档','doc','article','blog','博客']},
+    {key:'health', domains:[], keywords:['健身','养生','健康','fitness','workout','gym','冥想','meditation']},
+  ];
+  function classifyBookmark(node){
+    const domain = domainOf(node.url) || '';
+    for(const rule of CATEGORY_RULES){
+      if(rule.domains.some(d => domain === d || domain.endsWith('.' + d))) return rule.key;
+    }
+    const text = ((node.title || '') + ' ' + (node.url || '')).toLowerCase();
+    for(const rule of CATEGORY_RULES){
+      if(rule.keywords.some(k => text.includes(k))) return rule.key;
+    }
+    return 'other';
+  }
+
+  function computeAnalytics(){
+    const all = allBookmarks(state.tree);
+    const total = all.length;
+    const byCategory = new Map();
+    const byFolder = new Map();
+    const byMonth = new Map();
+    let ytCount = 0;
+    all.forEach(({node, path}) => {
+      const cat = classifyBookmark(node);
+      byCategory.set(cat, (byCategory.get(cat) || 0) + 1);
+      if(getYouTubeId(node.url)) ytCount++;
+      const topFolder = (path && path.length) ? path[0] : t('unsortedLabel');
+      byFolder.set(topFolder, (byFolder.get(topFolder) || 0) + 1);
+      if(node.dateAdded){
+        const ym = yearMonthOf(node.dateAdded);
+        byMonth.set(ym, (byMonth.get(ym) || 0) + 1);
+      }
+    });
+    const categories = Array.from(byCategory.entries())
+      .map(([key, count]) => ({key, count}))
+      .sort((a,b) => b.count - a.count);
+    const folders = Array.from(byFolder.entries())
+      .map(([name, count]) => ({name, count}))
+      .sort((a,b) => b.count - a.count);
+    const monthsAll = Array.from(byMonth.entries()).sort((a,b) => a[0].localeCompare(b[0]));
+    const monthsTruncated = monthsAll.length > 24;
+    const months = monthsTruncated ? monthsAll.slice(-24) : monthsAll;
+    const siteCounts = computeSiteCounts();
+    const dupGroups = computeDuplicateGroups();
+    const dupExtra = dupGroups.reduce((s,g) => s + (g.items.length - 1), 0);
+    return {
+      total, categories, folders, months, monthsTotal: monthsAll.length, monthsTruncated,
+      topDomains: siteCounts.slice(0, 10), distinctDomains: siteCounts.length,
+      ytCount, otherCount: total - ytCount, dupExtra,
+    };
+  }
+
+  function computeSuggestions(a){
+    const list = [];
+    if(a.dupExtra > 0) list.push(t('suggestionDup', a.dupExtra));
+    const groupSuggestions = computeGroupSuggestions();
+    if(groupSuggestions.length) list.push(t('suggestionGroup', groupSuggestions.length, groupSuggestions[0].domain));
+    if(a.folders.length && a.total > 0){
+      const top = a.folders[0];
+      if(top.count / a.total > 0.5) list.push(t('suggestionBigFolder', top.name, top.count));
+    }
+    if(a.total > 0){
+      const other = a.categories.find(c => c.key === 'other');
+      if(other && other.count / a.total > 0.3) list.push(t('suggestionManyUncategorized', other.count));
+    }
+    if(!list.length) list.push(t('suggestionNone'));
+    return list;
+  }
+
+  function buildBarSection(title, items, opts){
+    opts = opts || {};
+    const section = document.createElement('div');
+    section.className = 'analytics-section';
+    const h = document.createElement('h3');
+    h.textContent = title;
+    section.appendChild(h);
+    if(opts.note){
+      const note = document.createElement('div');
+      note.className = 'analytics-note';
+      note.textContent = opts.note;
+      section.appendChild(note);
+    }
+    if(!items.length){
+      const hint = document.createElement('div');
+      hint.className = 'empty-hint';
+      hint.textContent = t('noData');
+      section.appendChild(hint);
+      return section;
+    }
+    const maxCount = Math.max(...items.map(i => i.count), 1);
+    items.forEach(({label, count}) => {
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      const l = document.createElement('span');
+      l.className = 'bar-label';
+      l.textContent = label;
+      l.title = label;
+      const track = document.createElement('div');
+      track.className = 'bar-track';
+      const fill = document.createElement('div');
+      fill.className = 'bar-fill';
+      fill.style.width = Math.max(2, (count / maxCount) * 100) + '%';
+      track.appendChild(fill);
+      const c = document.createElement('span');
+      c.className = 'bar-count';
+      c.textContent = count;
+      row.appendChild(l);
+      row.appendChild(track);
+      row.appendChild(c);
+      section.appendChild(row);
+    });
+    return section;
+  }
+
+  function renderAnalyticsView(){
+    const el = document.getElementById('analyticsView');
+    const a = computeAnalytics();
+    el.innerHTML = '';
+
+    const summary = document.createElement('div');
+    summary.className = 'analytics-summary';
+    [
+      [a.total, t('statTotal')],
+      [a.distinctDomains, t('statDomains')],
+      [a.folders.length, t('statFolders')],
+      [a.dupExtra, t('statDupExtra')],
+    ].forEach(([num, label]) => {
+      const card = document.createElement('div');
+      card.className = 'analytics-stat';
+      const n = document.createElement('div');
+      n.className = 'num';
+      n.textContent = num;
+      const l = document.createElement('div');
+      l.className = 'label';
+      l.textContent = label;
+      card.appendChild(n);
+      card.appendChild(l);
+      summary.appendChild(card);
+    });
+    el.appendChild(summary);
+
+    el.appendChild(buildBarSection(
+      t('sectionCategory'),
+      a.categories.map(c => ({label: t('cat_' + c.key), count: c.count}))
+    ));
+
+    const ytSection = document.createElement('div');
+    ytSection.className = 'analytics-section';
+    const ytH = document.createElement('h3');
+    ytH.textContent = t('sectionYtRatio');
+    ytSection.appendChild(ytH);
+    const stack = document.createElement('div');
+    stack.className = 'stack-bar';
+    const ytPct = a.total ? (a.ytCount / a.total * 100) : 0;
+    const ytSeg = document.createElement('div');
+    ytSeg.className = 'seg';
+    ytSeg.style.width = ytPct + '%';
+    ytSeg.style.background = '#e8542e';
+    const otherSeg = document.createElement('div');
+    otherSeg.className = 'seg';
+    otherSeg.style.width = (100 - ytPct) + '%';
+    otherSeg.style.background = '#94a3b8';
+    stack.appendChild(ytSeg);
+    stack.appendChild(otherSeg);
+    ytSection.appendChild(stack);
+    const legend = document.createElement('div');
+    legend.className = 'stack-legend';
+    const ytLegend = document.createElement('span');
+    ytLegend.innerHTML = '<span class="dot" style="background:#e8542e"></span>YouTube (' + a.ytCount + ')';
+    const otherLegend = document.createElement('span');
+    otherLegend.innerHTML = '<span class="dot" style="background:#94a3b8"></span>' + escapeHtml(t('other')) + ' (' + a.otherCount + ')';
+    legend.appendChild(ytLegend);
+    legend.appendChild(otherLegend);
+    ytSection.appendChild(legend);
+    el.appendChild(ytSection);
+
+    el.appendChild(buildBarSection(
+      t('sectionTopDomains'),
+      a.topDomains.map(d => ({label: d.domain, count: d.count}))
+    ));
+
+    el.appendChild(buildBarSection(
+      t('sectionFolders'),
+      a.folders.map(f => ({label: f.name, count: f.count}))
+    ));
+
+    el.appendChild(buildBarSection(
+      t('sectionMonthly'),
+      a.months.map(([ym, count]) => ({label: ym, count})),
+      {note: a.monthsTruncated ? t('monthlyTruncated', a.monthsTotal) : null}
+    ));
+
+    const sugSection = document.createElement('div');
+    sugSection.className = 'analytics-section';
+    const sugH = document.createElement('h3');
+    sugH.textContent = t('sectionSuggestions');
+    sugSection.appendChild(sugH);
+    const ul = document.createElement('ul');
+    ul.className = 'suggestion-list';
+    computeSuggestions(a).forEach(s => {
+      const li = document.createElement('li');
+      li.textContent = s;
+      ul.appendChild(li);
+    });
+    sugSection.appendChild(ul);
+    el.appendChild(sugSection);
+
+    const note = document.createElement('div');
+    note.className = 'analytics-note';
+    note.textContent = t('analyticsNote');
+    el.appendChild(note);
+  }
+
+  function csvEscape(v){
+    const s = String(v == null ? '' : v);
+    if(/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function exportAnalyticsCsv(){
+    const rows = [[t('csvTitle'), t('csvUrl'), t('csvDomain'), t('csvCategory'), t('csvFolder'), t('csvDate')]];
+    allBookmarks(state.tree).forEach(({node, path}) => {
+      rows.push([
+        node.title || '',
+        node.url || '',
+        domainOf(node.url) || '',
+        t('cat_' + classifyBookmark(node)),
+        path.join(' / '),
+        node.dateAdded ? new Date(node.dateAdded).toISOString().slice(0, 10) : '',
+      ]);
+    });
+    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bookmark_analytics_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    showToast(t('csvExported'));
+  }
+
   function sortItems(items){
     const arr = items.slice();
     switch(state.sort){
@@ -393,6 +711,7 @@
     virtualViewsEl.innerHTML = '';
     virtualViewsEl.appendChild(makeTreeRow({label:t('allBookmarks'), count: total, view:'all'}));
     virtualViewsEl.appendChild(makeTreeRow({label:t('duplicates'), count: dupCount, view:'duplicates'}));
+    virtualViewsEl.appendChild(makeTreeRow({label:t('analyticsViewLabel'), count: total, view:'analytics'}));
   }
 
   function makeTreeRow({label, count, view, depth, folderId, hasChildren, expanded, iconUrl, iconSeed}){
@@ -531,19 +850,30 @@
     } else if(state.typeFilter === 'other'){
       items = items.filter(({node}) => !getYouTubeId(node.url));
     }
-    if(state.yearFilter !== 'all'){
-      items = items.filter(({node}) => node.dateAdded && new Date(node.dateAdded).getFullYear() === Number(state.yearFilter));
+    if(state.dateFrom){
+      items = items.filter(({node}) => node.dateAdded && yearMonthOf(node.dateAdded) >= state.dateFrom);
     }
-    if(state.monthFilter !== 'all'){
-      items = items.filter(({node}) => node.dateAdded && (new Date(node.dateAdded).getMonth() + 1) === Number(state.monthFilter));
+    if(state.dateTo){
+      items = items.filter(({node}) => node.dateAdded && yearMonthOf(node.dateAdded) <= state.dateTo);
     }
     return sortItems(items);
   }
+  function yearMonthOf(ts){
+    const d = new Date(ts);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
   function hasDateFilter(){
-    return state.yearFilter !== 'all' || state.monthFilter !== 'all';
+    return !!state.dateFrom || !!state.dateTo;
   }
 
   function renderMainHeader(){
+    document.getElementById('autoSelectDupBtn').style.display = state.currentView === 'duplicates' ? 'inline-flex' : 'none';
+    document.getElementById('exportCsvBtn').classList.toggle('hidden', state.currentView !== 'analytics');
+    if(state.currentView === 'analytics'){
+      mainTitleEl.textContent = t('analyticsViewLabel');
+      mainSubEl.textContent = t('analyticsSubtitle');
+      return;
+    }
     if(state.currentView === 'all'){
       mainTitleEl.textContent = t('allBookmarks');
     } else if(state.currentView === 'duplicates'){
@@ -557,7 +887,6 @@
     }
     const items = currentBookmarks();
     mainSubEl.textContent = items.length + t('itemsSuffix') + ((state.searchQuery || hasDateFilter()) ? t('filteredSuffix') : '');
-    document.getElementById('autoSelectDupBtn').style.display = state.currentView === 'duplicates' ? 'inline-flex' : 'none';
   }
 
   function renderCard({node, path, dupCount}){
@@ -789,6 +1118,17 @@
   }
 
   function renderGrid(){
+    const analyticsEl = document.getElementById('analyticsView');
+    if(state.currentView === 'analytics'){
+      gridEl.classList.add('hidden');
+      emptyStateEl.style.display = 'none';
+      analyticsEl.classList.remove('hidden');
+      renderAnalyticsView();
+      return;
+    }
+    analyticsEl.classList.add('hidden');
+    gridEl.classList.remove('hidden');
+
     const items = currentBookmarks();
     gridEl.innerHTML = '';
     if(items.length === 0){
@@ -844,50 +1184,28 @@
     bar.classList.toggle('show', n > 0);
   }
 
-  function renderYearFilterOptions(){
-    const sel = document.getElementById('yearFilter');
-    const years = new Set();
+  function renderDateRangeFilterUI(){
+    const fromEl = document.getElementById('dateFromFilter');
+    const toEl = document.getElementById('dateToFilter');
+    let min = null, max = null;
     allBookmarks(state.tree).forEach(({node}) => {
-      if(node.dateAdded) years.add(new Date(node.dateAdded).getFullYear());
+      if(!node.dateAdded) return;
+      const ym = yearMonthOf(node.dateAdded);
+      if(min === null || ym < min) min = ym;
+      if(max === null || ym > max) max = ym;
     });
-    const sorted = Array.from(years).sort((a,b) => b - a);
-    const prev = state.yearFilter;
-    sel.innerHTML = '';
-    const allOpt = document.createElement('option');
-    allOpt.value = 'all';
-    allOpt.textContent = t('allYears');
-    sel.appendChild(allOpt);
-    sorted.forEach(y => {
-      const opt = document.createElement('option');
-      opt.value = String(y);
-      opt.textContent = String(y);
-      sel.appendChild(opt);
-    });
-    if(prev !== 'all' && !sorted.includes(Number(prev))) state.yearFilter = 'all';
-    sel.value = state.yearFilter;
-  }
-  function renderMonthFilterOptions(){
-    const sel = document.getElementById('monthFilter');
-    const names = t('monthNames');
-    sel.innerHTML = '';
-    const allOpt = document.createElement('option');
-    allOpt.value = 'all';
-    allOpt.textContent = t('allMonths');
-    sel.appendChild(allOpt);
-    names.forEach((name, i) => {
-      const opt = document.createElement('option');
-      opt.value = String(i + 1);
-      opt.textContent = name;
-      sel.appendChild(opt);
-    });
-    sel.value = state.monthFilter;
+    if(min){ fromEl.min = min; toEl.min = min; }
+    if(max){ fromEl.max = max; toEl.max = max; }
+    fromEl.value = state.dateFrom;
+    toEl.value = state.dateTo;
+    document.getElementById('dateRangeClearBtn').classList.toggle('hidden', !hasDateFilter());
   }
 
   function render(){
     renderVirtualViews();
     renderSiteList();
     renderFolderTree();
-    renderYearFilterOptions();
+    renderDateRangeFilterUI();
     renderMainHeader();
     renderGrid();
     renderMoveSelect();
@@ -1011,12 +1329,17 @@
     state.sort = e.target.value;
     render();
   });
-  document.getElementById('yearFilter').addEventListener('change', (e) => {
-    state.yearFilter = e.target.value;
+  document.getElementById('dateFromFilter').addEventListener('change', (e) => {
+    state.dateFrom = e.target.value;
     render();
   });
-  document.getElementById('monthFilter').addEventListener('change', (e) => {
-    state.monthFilter = e.target.value;
+  document.getElementById('dateToFilter').addEventListener('change', (e) => {
+    state.dateTo = e.target.value;
+    render();
+  });
+  document.getElementById('dateRangeClearBtn').addEventListener('click', () => {
+    state.dateFrom = '';
+    state.dateTo = '';
     render();
   });
 
@@ -1232,6 +1555,8 @@
       showToast(t('exported'));
     });
   });
+
+  document.getElementById('exportCsvBtn').addEventListener('click', exportAnalyticsCsv);
 
   /* ================= Language toggle ================= */
   document.getElementById('langToggleBtn').addEventListener('click', () => {

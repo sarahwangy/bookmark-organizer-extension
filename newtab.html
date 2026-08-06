@@ -248,6 +248,15 @@
     border:1px solid var(--line); background:var(--panel); color:var(--ink);
     padding:7px 10px; border-radius:9px; font-size:12.5px; cursor:pointer; flex-shrink:0;
   }
+  .hidden{display:none !important;}
+  .date-range{display:flex; align-items:center; gap:5px; flex-shrink:0;}
+  .date-range-sep{color:var(--sub); font-size:12px;}
+  .toolbar-date{
+    border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    padding:6px 8px; border-radius:9px; font-size:12px; cursor:pointer; width:132px;
+  }
+  .toolbar-date::-webkit-calendar-picker-indicator{opacity:.6; cursor:pointer;}
+  [data-theme="dark"] .toolbar-date::-webkit-calendar-picker-indicator{filter:invert(1);}
   .appearance-wrap{position:relative;}
   .appearance-popover{
     position:absolute; top:calc(100% + 6px); right:0; background:var(--panel); border:1px solid var(--line);
@@ -322,6 +331,28 @@
   .list-badge.dead{background:rgba(198,40,40,.12); color:#c62828;}
   .list-badge.dup{background:rgba(124,58,237,.12); color:#7c3aed;}
 
+  /* ---------- Analytics view ---------- */
+  .analytics{display:flex; flex-direction:column; gap:20px; max-width:920px;}
+  .analytics-summary{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;}
+  .analytics-stat{background:var(--panel); border-radius:12px; padding:14px 16px; box-shadow:var(--card-shadow);}
+  .analytics-stat .num{font-size:22px; font-weight:700; color:var(--ink); line-height:1.2;}
+  .analytics-stat .label{font-size:11.5px; color:var(--sub); margin-top:3px;}
+  .analytics-section{background:var(--panel); border-radius:14px; padding:16px 18px; box-shadow:var(--card-shadow);}
+  .analytics-section h3{font-size:13.5px; margin:0 0 12px; color:var(--ink); font-weight:700;}
+  .analytics-section .empty-hint{font-size:12.5px; color:var(--sub);}
+  .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:12.5px;}
+  .bar-row:last-child{margin-bottom:0;}
+  .bar-row .bar-label{width:150px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink);}
+  .bar-row .bar-track{flex:1; height:16px; background:var(--bg); border-radius:6px; overflow:hidden;}
+  .bar-row .bar-fill{height:100%; border-radius:6px; background:var(--accent); min-width:2px;}
+  .bar-row .bar-count{width:42px; text-align:right; flex-shrink:0; color:var(--sub); font-size:11.5px;}
+  .stack-bar{display:flex; height:24px; border-radius:8px; overflow:hidden; margin-bottom:10px;}
+  .stack-bar .seg{height:100%; min-width:2px;}
+  .stack-legend{display:flex; flex-wrap:wrap; gap:16px; font-size:12px; color:var(--sub);}
+  .stack-legend .dot{width:9px; height:9px; border-radius:3px; display:inline-block; margin-right:5px;}
+  .suggestion-list{margin:0; padding-left:18px; font-size:13px; color:var(--ink); line-height:1.8;}
+  .analytics-note{font-size:11.5px; color:var(--sub); line-height:1.6; margin-top:2px;}
+
   /* ---------- Dead-link / duplicate badges ---------- */
   .card-thumb .dead-badge{
     position:absolute; bottom:6px; left:6px; background:rgba(198,40,40,.92); color:#fff;
@@ -375,12 +406,12 @@
       <option value="title_asc" data-i18n="sortTitleAsc">标题 A→Z</option>
       <option value="title_desc" data-i18n="sortTitleDesc">标题 Z→A</option>
     </select>
-    <select class="toolbar-select" id="yearFilter" data-i18n-title="yearFilterTitle" title="按年份筛选">
-      <option value="all" data-i18n="allYears">全部年份</option>
-    </select>
-    <select class="toolbar-select" id="monthFilter" data-i18n-title="monthFilterTitle" title="按月份筛选">
-      <option value="all" data-i18n="allMonths">全部月份</option>
-    </select>
+    <div class="date-range">
+      <input type="month" class="toolbar-date" id="dateFromFilter" data-i18n-title="dateFromTitle" title="起始年月">
+      <span class="date-range-sep">–</span>
+      <input type="month" class="toolbar-date" id="dateToFilter" data-i18n-title="dateToTitle" title="结束年月">
+      <button type="button" class="btn ghost small hidden" id="dateRangeClearBtn" data-i18n="dateRangeClear">×</button>
+    </div>
     <div class="topbar-actions">
       <span class="scan-progress" id="scanProgress"></span>
       <button class="btn ghost small" id="groupSuggestBtn" data-i18n="groupSuggestBtn">智能分组</button>
@@ -442,8 +473,10 @@
         <h1 id="mainTitle">全部书签</h1>
         <span class="sub" id="mainSub"></span>
         <button class="btn small ghost" id="autoSelectDupBtn" data-i18n="autoSelectDupBtn" style="display:none;margin-left:auto;">选中所有多余重复项</button>
+        <button type="button" class="btn small ghost hidden" id="exportCsvBtn" data-i18n="exportCsvBtn" style="margin-left:auto;">导出 CSV 报告</button>
       </div>
       <div class="grid" id="grid"></div>
+      <div class="analytics hidden" id="analyticsView"></div>
       <div class="empty-state" id="emptyState" style="display:none;">
         <div class="big">📭</div>
         <div data-i18n="emptyState">这里还没有书签</div>
