@@ -1,5 +1,7 @@
 # 书签整理台 (Bookmark Organizer)
 
+**English | [中文](README.zh-CN.md)**
+
 A Chrome new-tab extension that replaces the default new-tab page with a magazine-style card view of your bookmarks — YouTube thumbnail previews, multi-select + drag-and-drop into folders, and direct read/write access to your real Chrome bookmarks.
 
 ## Features
@@ -9,6 +11,7 @@ A Chrome new-tab extension that replaces the default new-tab page with a magazin
 - Multi-select bookmarks and drag them into folders
 - Search, filter by type (YouTube / other), and sort by date or title
 - Card size options and dark mode
+- Built-in English/中文 language toggle (top bar) — the extension UI itself is bilingual, not just this README
 - Works directly on your real Chrome bookmarks — no external server, no account, no data leaves your browser
 
 ## Screenshots
