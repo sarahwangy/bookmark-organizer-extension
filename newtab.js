@@ -284,10 +284,11 @@
     allBookmarks(state.tree).forEach(({node}) => {
       const d = domainOf(node.url);
       if(!d) return;
-      byDomain.set(d, (byDomain.get(d) || 0) + 1);
+      if(!byDomain.has(d)) byDomain.set(d, {count:0, sampleUrl: node.url});
+      byDomain.get(d).count++;
     });
     return Array.from(byDomain.entries())
-      .map(([domain, count]) => ({domain, count}))
+      .map(([domain, v]) => ({domain, count: v.count, sampleUrl: v.sampleUrl}))
       .sort((a,b) => b.count - a.count || a.domain.localeCompare(b.domain));
   }
   function computeGroupSuggestions(){
@@ -374,7 +375,7 @@
     virtualViewsEl.appendChild(makeTreeRow({label:t('duplicates'), count: dupCount, view:'duplicates'}));
   }
 
-  function makeTreeRow({label, count, view, depth, folderId, hasChildren, expanded}){
+  function makeTreeRow({label, count, view, depth, folderId, hasChildren, expanded, iconUrl, iconSeed}){
     const row = document.createElement('div');
     row.className = 'tree-item' + (state.currentView === view ? ' active' : '');
     row.style.marginLeft = depth ? (depth*10)+'px' : '0px';
@@ -391,6 +392,26 @@
       });
     }
     row.appendChild(caret);
+
+    if(iconUrl){
+      const iconWrap = document.createElement('span');
+      iconWrap.className = 'tree-icon-wrap';
+      const icon = document.createElement('img');
+      icon.className = 'tree-icon';
+      icon.loading = 'lazy';
+      icon.src = iconUrl;
+      icon.alt = '';
+      icon.onerror = function(){
+        this.remove();
+        iconWrap.style.background = gradientFor(iconSeed || label);
+        const letter = document.createElement('span');
+        letter.className = 'tree-icon-fallback';
+        letter.textContent = (iconSeed || label).replace(/^[^a-z0-9]+/i,'')[0]?.toUpperCase() || '?';
+        iconWrap.appendChild(letter);
+      };
+      iconWrap.appendChild(icon);
+      row.appendChild(iconWrap);
+    }
 
     const name = document.createElement('span');
     name.className = 'name';
@@ -451,9 +472,11 @@
     siteListEl.innerHTML = '';
     sites.forEach(s => {
       siteListEl.appendChild(makeTreeRow({
-        label: '🌐 ' + s.domain,
+        label: s.domain,
         count: s.count,
         view: 'site:' + s.domain,
+        iconUrl: faviconUrl(s.sampleUrl),
+        iconSeed: s.domain,
       }));
     });
   }

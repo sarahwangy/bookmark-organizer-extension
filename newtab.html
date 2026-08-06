@@ -77,6 +77,14 @@
   .tree-item .caret.collapsed{transform:rotate(-90deg);}
   .tree-item .caret.empty{visibility:hidden;}
   .tree-item .name{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .tree-icon-wrap{
+    width:20px; height:20px; border-radius:6px; flex-shrink:0; overflow:hidden;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+    box-shadow:0 0 0 1px rgba(28,27,25,.06);
+  }
+  .tree-icon-wrap .tree-icon{width:14px; height:14px; display:block;}
+  .tree-icon-wrap .tree-icon-fallback{font-size:10px; font-weight:700; color:#fff;}
+  [data-theme="dark"] .tree-icon-wrap{background:#332f28;}
   .tree-item .count{font-size:11px; color:var(--sub); background:var(--bg); border-radius:20px; padding:1px 7px;}
   .tree-item.active .count{background:#f7d9cd; color:var(--accent);}
   .tree-children{margin-left:16px;}
