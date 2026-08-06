@@ -488,6 +488,115 @@
     return list;
   }
 
+  const PIE_COLORS = ['#e8542e','#6366f1','#0ea5e9','#f59e0b','#10b981','#ec4899','#8b5cf6','#22c55e','#f43f5e','#64748b'];
+  function buildPieChart(title, items, opts){
+    opts = opts || {};
+    const section = document.createElement('div');
+    section.className = 'analytics-section';
+    const h = document.createElement('h3');
+    h.textContent = title;
+    section.appendChild(h);
+    if(!items.length){
+      const hint = document.createElement('div');
+      hint.className = 'empty-hint';
+      hint.textContent = t('noData');
+      section.appendChild(hint);
+      return section;
+    }
+    const total = items.reduce((s,i) => s + i.count, 0) || 1;
+    let cursor = 0;
+    const stops = items.map((item, i) => {
+      const color = PIE_COLORS[i % PIE_COLORS.length];
+      const pct = item.count / total * 100;
+      const stop = color + ' ' + cursor + '% ' + (cursor + pct) + '%';
+      cursor += pct;
+      return stop;
+    });
+    const wrap = document.createElement('div');
+    wrap.className = 'pie-section';
+    const pie = document.createElement('div');
+    pie.className = 'pie-chart';
+    pie.style.background = 'conic-gradient(' + stops.join(', ') + ')';
+    wrap.appendChild(pie);
+    const legend = document.createElement('div');
+    legend.className = 'pie-legend';
+    items.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.className = 'pie-legend-item' + (opts.onClick ? ' clickable' : '');
+      const sw = document.createElement('span');
+      sw.className = 'swatch';
+      sw.style.background = PIE_COLORS[i % PIE_COLORS.length];
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = item.label;
+      name.title = item.label;
+      const pct = document.createElement('span');
+      pct.className = 'pct';
+      pct.textContent = Math.round(item.count / total * 100) + '%';
+      const cnt = document.createElement('span');
+      cnt.className = 'cnt';
+      cnt.textContent = item.count;
+      row.appendChild(sw);
+      row.appendChild(name);
+      row.appendChild(pct);
+      row.appendChild(cnt);
+      if(opts.onClick) row.addEventListener('click', () => opts.onClick(item));
+      legend.appendChild(row);
+    });
+    wrap.appendChild(legend);
+    section.appendChild(wrap);
+    return section;
+  }
+
+  function buildColumnChart(title, items, opts){
+    opts = opts || {};
+    const section = document.createElement('div');
+    section.className = 'analytics-section';
+    const h = document.createElement('h3');
+    h.textContent = title;
+    section.appendChild(h);
+    if(opts.note){
+      const note = document.createElement('div');
+      note.className = 'analytics-note';
+      note.textContent = opts.note;
+      section.appendChild(note);
+    }
+    if(!items.length){
+      const hint = document.createElement('div');
+      hint.className = 'empty-hint';
+      hint.textContent = t('noData');
+      section.appendChild(hint);
+      return section;
+    }
+    const maxCount = Math.max(...items.map(i => i.count), 1);
+    const chart = document.createElement('div');
+    chart.className = 'column-chart';
+    items.forEach(item => {
+      const {label, count} = item;
+      const col = document.createElement('div');
+      col.className = 'col' + (opts.onClick ? ' clickable' : '');
+      const cnt = document.createElement('div');
+      cnt.className = 'col-count';
+      cnt.textContent = count;
+      const barWrap = document.createElement('div');
+      barWrap.className = 'col-bar-wrap';
+      const barEl = document.createElement('div');
+      barEl.className = 'col-bar';
+      barEl.style.height = Math.max(3, (count / maxCount) * 120) + 'px';
+      barWrap.appendChild(barEl);
+      const lbl = document.createElement('div');
+      lbl.className = 'col-label';
+      lbl.textContent = label;
+      col.appendChild(cnt);
+      col.appendChild(barWrap);
+      col.appendChild(lbl);
+      if(opts.onClick) col.addEventListener('click', () => opts.onClick(item));
+      chart.appendChild(col);
+    });
+    section.appendChild(chart);
+    return section;
+  }
+
   function buildBarSection(title, items, opts){
     opts = opts || {};
     const section = document.createElement('div');
@@ -604,13 +713,13 @@
     ytSection.appendChild(legend);
     el.appendChild(ytSection);
 
-    el.appendChild(buildBarSection(
+    el.appendChild(buildPieChart(
       t('sectionTopDomains'),
       a.topDomains.map(d => ({label: d.domain, count: d.count, domain: d.domain})),
       {onClick: item => goToFilteredView({view: 'site:' + item.domain})}
     ));
 
-    el.appendChild(buildBarSection(
+    el.appendChild(buildPieChart(
       t('sectionFolders'),
       a.folders.map(f => ({label: f.name, count: f.count, name: f.name})),
       {onClick: item => {
@@ -628,7 +737,7 @@
       }
     ));
 
-    el.appendChild(buildBarSection(
+    el.appendChild(buildColumnChart(
       t('sectionMonthly'),
       a.months.map(([ym, count]) => ({label: ym, count, ym})),
       {
