@@ -30,6 +30,7 @@
       darkModeLabel: '深色模式',
       viewsLabel: '视图',
       sitesLabel: '网站',
+      sitesLabelScoped: name => '网站 · ' + name,
       siteSearchPlaceholder: '筛选网站...',
       foldersLabel: '文件夹',
       newFolderBtn: '新建文件夹',
@@ -143,6 +144,7 @@
       darkModeLabel: 'Dark Mode',
       viewsLabel: 'Views',
       sitesLabel: 'Sites',
+      sitesLabelScoped: name => 'Sites · ' + name,
       siteSearchPlaceholder: 'Filter sites...',
       foldersLabel: 'Folders',
       newFolderBtn: 'New Folder',
@@ -370,9 +372,9 @@
     map.forEach((items) => { if(items.length > 1) groups.push({items}); });
     return groups;
   }
-  function computeSiteCounts(){
+  function computeSiteCounts(scopeItems){
     const byDomain = new Map();
-    allBookmarks(state.tree).forEach(({node}) => {
+    (scopeItems || allBookmarks(state.tree)).forEach(({node}) => {
       const d = domainOf(node.url);
       if(!d) return;
       if(!byDomain.has(d)) byDomain.set(d, {count:0, sampleUrl: node.url});
@@ -381,6 +383,22 @@
     return Array.from(byDomain.entries())
       .map(([domain, v]) => ({domain, count: v.count, sampleUrl: v.sampleUrl}))
       .sort((a,b) => b.count - a.count || a.domain.localeCompare(b.domain));
+  }
+  function currentFolderScopeId(){
+    if(state.currentView.startsWith('folder:')) return state.currentView.slice(7);
+    if(state.currentView.startsWith('foldersite:')){
+      const rest = state.currentView.slice(11);
+      return rest.slice(0, rest.indexOf(':'));
+    }
+    return null;
+  }
+  function bookmarksInScope(){
+    const fid = currentFolderScopeId();
+    if(fid){
+      const f = findNode(state.tree, fid);
+      return f ? allBookmarks(f) : [];
+    }
+    return allBookmarks(state.tree);
   }
   function computeGroupSuggestions(){
     const byDomain = new Map();
@@ -925,14 +943,17 @@
   const siteListEl = document.getElementById('siteList');
   function renderSiteList(){
     const q = state.siteFilterQuery.trim().toLowerCase();
-    let sites = computeSiteCounts();
+    const fid = currentFolderScopeId();
+    const scopeFolder = fid ? findNode(state.tree, fid) : null;
+    document.getElementById('sitesLabelEl').textContent = scopeFolder ? t('sitesLabelScoped', scopeFolder.title) : t('sitesLabel');
+    let sites = computeSiteCounts(bookmarksInScope());
     if(q) sites = sites.filter(s => s.domain.toLowerCase().includes(q));
     siteListEl.innerHTML = '';
     sites.forEach(s => {
       siteListEl.appendChild(makeTreeRow({
         label: s.domain,
         count: s.count,
-        view: 'site:' + s.domain,
+        view: fid ? ('foldersite:' + fid + ':' + s.domain) : ('site:' + s.domain),
         iconUrl: faviconUrl(s.sampleUrl),
         iconSeed: s.domain,
       }));
@@ -958,6 +979,14 @@
       items = allBookmarks(state.tree)
         .filter(x => domainOf(x.node.url) === domain)
         .map(x => ({node:x.node, path: x.path.join(' / ')}));
+    } else if(state.currentView.startsWith('foldersite:')){
+      const rest = state.currentView.slice(11);
+      const fid = rest.slice(0, rest.indexOf(':'));
+      const domain = rest.slice(rest.indexOf(':') + 1);
+      const f = findNode(state.tree, fid);
+      items = f ? allBookmarks(f)
+        .filter(x => domainOf(x.node.url) === domain)
+        .map(x => ({node:x.node, path: x.path.join(' / ')})) : [];
     } else if(state.currentView.startsWith('category:')){
       const key = state.currentView.slice(9);
       items = allBookmarks(state.tree)
@@ -1018,6 +1047,12 @@
       mainTitleEl.textContent = f ? ('📁 ' + f.title) : '';
     } else if(state.currentView.startsWith('site:')){
       mainTitleEl.textContent = '🌐 ' + state.currentView.slice(5);
+    } else if(state.currentView.startsWith('foldersite:')){
+      const rest = state.currentView.slice(11);
+      const fid = rest.slice(0, rest.indexOf(':'));
+      const domain = rest.slice(rest.indexOf(':') + 1);
+      const f = findNode(state.tree, fid);
+      mainTitleEl.textContent = (f ? '📁 ' + f.title : '') + '  ·  🌐 ' + domain;
     } else if(state.currentView.startsWith('category:')){
       mainTitleEl.textContent = '🏷️ ' + t('cat_' + state.currentView.slice(9));
     } else if(state.currentView.startsWith('year:')){
