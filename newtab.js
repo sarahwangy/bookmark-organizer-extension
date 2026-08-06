@@ -55,7 +55,10 @@
       sectionYtRatio: 'YouTube / 其他网站占比',
       sectionTopDomains: '热门域名 Top 10',
       sectionFolders: '文件夹分布',
+      sectionYearly: '按年份添加趋势',
       sectionMonthly: '按月添加趋势',
+      peakYearNote: (y, n) => '添加最多的年份：' + y + '（' + n + ' 项）',
+      peakMonthNote: (ym, n) => '添加最多的月份：' + ym + '（' + n + ' 项）',
       sectionSuggestions: '整理建议',
       monthlyTruncated: n => '只显示最近 24 个月（共 ' + n + ' 个月有记录）',
       analyticsNote: '主题分类基于本地关键词匹配，完全在你的浏览器里计算，不调用任何 AI 接口，不需要 API Key，也不会有任何数据离开你的浏览器。',
@@ -165,7 +168,10 @@
       sectionYtRatio: 'YouTube vs. Other Sites',
       sectionTopDomains: 'Top 10 Domains',
       sectionFolders: 'Folder Distribution',
+      sectionYearly: 'Bookmarks Added Per Year',
       sectionMonthly: 'Bookmarks Added Per Month',
+      peakYearNote: (y, n) => 'Most active year: ' + y + ' (' + n + ' items)',
+      peakMonthNote: (ym, n) => 'Most active month: ' + ym + ' (' + n + ' items)',
       sectionSuggestions: 'Cleanup Suggestions',
       monthlyTruncated: n => 'Showing the most recent 24 months (' + n + ' months total have data)',
       analyticsNote: 'Topic classification runs on local keyword matching entirely inside your browser — no AI API is called, no API key is needed, and no data ever leaves your browser.',
@@ -446,11 +452,20 @@
     const monthsAll = Array.from(byMonth.entries()).sort((a,b) => a[0].localeCompare(b[0]));
     const monthsTruncated = monthsAll.length > 24;
     const months = monthsTruncated ? monthsAll.slice(-24) : monthsAll;
+    const byYear = new Map();
+    monthsAll.forEach(([ym, count]) => {
+      const y = ym.slice(0, 4);
+      byYear.set(y, (byYear.get(y) || 0) + count);
+    });
+    const years = Array.from(byYear.entries()).sort((a,b) => a[0].localeCompare(b[0]));
+    const peakYear = years.length ? years.reduce((a,b) => b[1] > a[1] ? b : a) : null;
+    const peakMonth = monthsAll.length ? monthsAll.reduce((a,b) => b[1] > a[1] ? b : a) : null;
     const siteCounts = computeSiteCounts();
     const dupGroups = computeDuplicateGroups();
     const dupExtra = dupGroups.reduce((s,g) => s + (g.items.length - 1), 0);
     return {
       total, categories, folders, months, monthsTotal: monthsAll.length, monthsTruncated,
+      years, peakYear, peakMonth,
       topDomains: siteCounts.slice(0, 10), distinctDomains: siteCounts.length,
       ytCount, otherCount: total - ytCount, dupExtra,
     };
@@ -591,9 +606,18 @@
     ));
 
     el.appendChild(buildBarSection(
+      t('sectionYearly'),
+      a.years.map(([y, count]) => ({label: y, count})),
+      {note: a.peakYear ? t('peakYearNote', a.peakYear[0], a.peakYear[1]) : null}
+    ));
+
+    el.appendChild(buildBarSection(
       t('sectionMonthly'),
       a.months.map(([ym, count]) => ({label: ym, count})),
-      {note: a.monthsTruncated ? t('monthlyTruncated', a.monthsTotal) : null}
+      {note: [
+        a.peakMonth ? t('peakMonthNote', a.peakMonth[0], a.peakMonth[1]) : null,
+        a.monthsTruncated ? t('monthlyTruncated', a.monthsTotal) : null,
+      ].filter(Boolean).join(' · ') || null}
     ));
 
     const sugSection = document.createElement('div');
