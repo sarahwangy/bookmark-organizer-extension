@@ -45,6 +45,7 @@
       analyticsViewLabel: '📊 分析',
       analyticsSubtitle: '基于全部书签生成',
       exportCsvBtn: '导出 CSV 报告',
+      exportPdfBtn: '导出 PDF',
       unsortedLabel: '未分类',
       noData: '暂无数据',
       other: '其他',
@@ -159,6 +160,7 @@
       analyticsViewLabel: '📊 Analytics',
       analyticsSubtitle: 'Based on all bookmarks',
       exportCsvBtn: 'Export CSV Report',
+      exportPdfBtn: 'Export PDF',
       unsortedLabel: 'Unsorted',
       noData: 'No data',
       other: 'Other',
@@ -784,6 +786,16 @@
     showToast(t('csvExported'));
   }
 
+  function exportAnalyticsPdf(){
+    document.body.classList.add('printing-analytics');
+    const cleanup = () => {
+      document.body.classList.remove('printing-analytics');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+  }
+
   function sortItems(items){
     const arr = items.slice();
     switch(state.sort){
@@ -1032,6 +1044,7 @@
   function renderMainHeader(){
     document.getElementById('autoSelectDupBtn').style.display = state.currentView === 'duplicates' ? 'inline-flex' : 'none';
     document.getElementById('exportCsvBtn').classList.toggle('hidden', state.currentView !== 'analytics');
+    document.getElementById('exportPdfBtn').classList.toggle('hidden', state.currentView !== 'analytics');
     if(state.currentView === 'analytics'){
       mainTitleEl.textContent = t('analyticsViewLabel');
       mainSubEl.textContent = t('analyticsSubtitle');
@@ -1744,6 +1757,7 @@
   });
 
   document.getElementById('exportCsvBtn').addEventListener('click', exportAnalyticsCsv);
+  document.getElementById('exportPdfBtn').addEventListener('click', exportAnalyticsPdf);
 
   /* ================= Language toggle ================= */
   document.getElementById('langToggleBtn').addEventListener('click', () => {
