@@ -296,39 +296,40 @@
   </div>
 
   <div class="topbar">
-    <div class="brand"><span class="dot"></span>书签整理台</div>
+    <div class="brand"><span class="dot"></span><span data-i18n="brand">书签整理台</span></div>
     <div class="search">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="searchInput" type="text" placeholder="搜索标题或网址...">
+      <input id="searchInput" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="搜索标题或网址...">
     </div>
-    <select class="toolbar-select" id="typeFilter" title="按类型筛选">
-      <option value="all">全部类型</option>
+    <select class="toolbar-select" id="typeFilter" data-i18n-title="filterTitle" title="按类型筛选">
+      <option value="all" data-i18n="filterAll">全部类型</option>
       <option value="youtube">YouTube</option>
-      <option value="other">其他网站</option>
+      <option value="other" data-i18n="filterOther">其他网站</option>
     </select>
-    <select class="toolbar-select" id="sortSelect" title="排序方式">
-      <option value="date_desc">最近添加</option>
-      <option value="date_asc">最早添加</option>
-      <option value="title_asc">标题 A→Z</option>
-      <option value="title_desc">标题 Z→A</option>
+    <select class="toolbar-select" id="sortSelect" data-i18n-title="sortTitle" title="排序方式">
+      <option value="date_desc" data-i18n="sortDateDesc">最近添加</option>
+      <option value="date_asc" data-i18n="sortDateAsc">最早添加</option>
+      <option value="title_asc" data-i18n="sortTitleAsc">标题 A→Z</option>
+      <option value="title_desc" data-i18n="sortTitleDesc">标题 Z→A</option>
     </select>
     <div class="topbar-actions">
       <span class="scan-progress" id="scanProgress"></span>
-      <button class="btn ghost small" id="groupSuggestBtn">智能分组</button>
-      <button class="btn ghost small" id="deadLinkBtn">检查失效链接</button>
-      <button class="btn ghost small" id="refreshBtn">刷新</button>
-      <button class="btn ghost small" id="saveJsonBtn">导出备份(JSON)</button>
+      <button class="btn ghost small" id="groupSuggestBtn" data-i18n="groupSuggestBtn">智能分组</button>
+      <button class="btn ghost small" id="deadLinkBtn" data-i18n="deadLinkBtn">检查失效链接</button>
+      <button class="btn ghost small" id="refreshBtn" data-i18n="refreshBtn">刷新</button>
+      <button class="btn ghost small" id="saveJsonBtn" data-i18n="saveJsonBtn">导出备份(JSON)</button>
+      <button class="btn ghost small" id="langToggleBtn">中文 / EN</button>
       <div class="appearance-wrap">
-        <button class="btn ghost small" id="appearanceBtn">⚙ 外观</button>
+        <button class="btn ghost small" id="appearanceBtn" data-i18n="appearanceBtn">⚙ 外观</button>
         <div class="appearance-popover" id="appearancePopover" style="display:none;">
-          <div class="field-label">卡片大小</div>
+          <div class="field-label" data-i18n="cardSizeLabel">卡片大小</div>
           <div class="size-toggle" id="sizeToggle">
-            <button data-size="sm">小</button>
-            <button data-size="md">中</button>
-            <button data-size="lg">大</button>
+            <button data-size="sm" data-i18n="sizeSm">小</button>
+            <button data-size="md" data-i18n="sizeMd">中</button>
+            <button data-size="lg" data-i18n="sizeLg">大</button>
           </div>
           <div class="dark-toggle-row">
-            <span>深色模式</span>
+            <span data-i18n="darkModeLabel">深色模式</span>
             <label class="switch">
               <input type="checkbox" id="darkModeToggle">
               <span class="slider"></span>
@@ -341,18 +342,18 @@
 
   <div class="layout">
     <div class="sidebar" id="sidebar">
-      <div class="sidebar-section-title">视图</div>
+      <div class="sidebar-section-title" data-i18n="viewsLabel">视图</div>
       <div id="virtualViews"></div>
       <div class="sidebar-divider"></div>
-      <div class="sidebar-section-title">文件夹</div>
+      <div class="sidebar-section-title" data-i18n="foldersLabel">文件夹</div>
       <div id="folderTree"></div>
       <div class="new-folder-btn" id="newFolderBtn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
-        新建文件夹
+        <span data-i18n="newFolderBtn">新建文件夹</span>
       </div>
       <div class="trash-zone" id="trashZone">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0-1 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 6"/></svg>
-        拖到这里删除
+        <span data-i18n="trashZone">拖到这里删除</span>
       </div>
     </div>
 
@@ -360,12 +361,12 @@
       <div class="main-header">
         <h1 id="mainTitle">全部书签</h1>
         <span class="sub" id="mainSub"></span>
-        <button class="btn small ghost" id="autoSelectDupBtn" style="display:none;margin-left:auto;">选中所有多余重复项</button>
+        <button class="btn small ghost" id="autoSelectDupBtn" data-i18n="autoSelectDupBtn" style="display:none;margin-left:auto;">选中所有多余重复项</button>
       </div>
       <div class="grid" id="grid"></div>
       <div class="empty-state" id="emptyState" style="display:none;">
         <div class="big">📭</div>
-        <div>这里还没有书签</div>
+        <div data-i18n="emptyState">这里还没有书签</div>
       </div>
     </div>
   </div>
@@ -373,9 +374,9 @@
   <div class="selection-bar" id="selectionBar">
     <span class="count" id="selectionCount">已选择 0 项</span>
     <select id="moveSelect"></select>
-    <button class="btn small" id="moveBtn">移动</button>
-    <button class="btn small danger" id="deleteSelectedBtn">删除</button>
-    <button class="btn small ghost" id="clearSelectionBtn" style="background:transparent;color:#cfcdc8;">取消选择</button>
+    <button class="btn small" id="moveBtn" data-i18n="moveBtn">移动</button>
+    <button class="btn small danger" id="deleteSelectedBtn" data-i18n="deleteSelectedBtn">删除</button>
+    <button class="btn small ghost" id="clearSelectionBtn" style="background:transparent;color:#cfcdc8;" data-i18n="clearSelectionBtn">取消选择</button>
   </div>
 
   <div class="modal-overlay" id="modalOverlay">

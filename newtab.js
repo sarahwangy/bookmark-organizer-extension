@@ -1,11 +1,166 @@
 (function(){
   "use strict";
 
+  /* ================= i18n ================= */
+  const I18N = {
+    zh: {
+      brand: '书签整理台',
+      searchPlaceholder: '搜索标题或网址...',
+      filterTitle: '按类型筛选',
+      filterAll: '全部类型',
+      filterOther: '其他网站',
+      sortTitle: '排序方式',
+      sortDateDesc: '最近添加',
+      sortDateAsc: '最早添加',
+      sortTitleAsc: '标题 A→Z',
+      sortTitleDesc: '标题 Z→A',
+      groupSuggestBtn: '智能分组',
+      deadLinkBtn: '检查失效链接',
+      refreshBtn: '刷新',
+      saveJsonBtn: '导出备份(JSON)',
+      appearanceBtn: '⚙ 外观',
+      cardSizeLabel: '卡片大小',
+      sizeSm: '小', sizeMd: '中', sizeLg: '大',
+      darkModeLabel: '深色模式',
+      viewsLabel: '视图',
+      foldersLabel: '文件夹',
+      newFolderBtn: '新建文件夹',
+      trashZone: '拖到这里删除',
+      autoSelectDupBtn: '选中所有多余重复项',
+      emptyState: '这里还没有书签',
+      moveBtn: '移动',
+      deleteSelectedBtn: '删除',
+      clearSelectionBtn: '取消选择',
+      allBookmarks: '📚 全部书签',
+      duplicates: '🔁 重复书签',
+      unnamedFolder: '未命名文件夹',
+      itemsSuffix: ' 项',
+      filteredSuffix: '（已按关键词筛选）',
+      selectedCount: n => '已选择 ' + n + ' 项',
+      youtubeBadge: 'YouTube',
+      deadBadge: '⚠ 可能失效',
+      dupBadge: n => '重复 ×' + n,
+      folderCreated: name => '已创建文件夹「' + name + '」',
+      folderCreatedMoved: (name, n) => '已创建文件夹「' + name + '」并移动 ' + n + ' 项',
+      movedTo: (n, name) => '已移动 ' + n + ' 项到「' + name + '」',
+      refreshed: '已刷新',
+      selectedDup: n => '已选中 ' + n + ' 个多余的重复项，可以直接删除',
+      noDup: '没有发现多余的重复项',
+      noBookmarksInView: '当前视图没有书签',
+      scanning: (done, total) => '检测中 ' + done + '/' + total,
+      scanDone: n => '检测完成，发现 ' + n + ' 个可能失效的链接（受浏览器限制，此结果仅供参考）',
+      deleted: n => '已删除 ' + n + ' 项',
+      exported: '已导出书签备份',
+      newFolderTitle: '新建文件夹',
+      newFolderName: '文件夹名称',
+      cancel: '取消',
+      create: '创建',
+      confirmDeleteTitle: '删除所选项？',
+      confirmDeleteBody: n => '将从 Chrome 书签中删除 ' + n + ' 项，此操作不可撤销。',
+      delete: '删除',
+      smartGroupTitle: '智能分组建议',
+      smartGroupEmptyBody: '暂时没有发现明显可以归到一起的书签。当同一个网站有 3 个以上书签分散在不同文件夹时，这里会给出建议。',
+      gotIt: '知道了',
+      smartGroupBody: '下面这些网站的书签分散在不同地方，可以一键归到同一个新文件夹：',
+      close: '关闭',
+      groupCount: n => n + ' 项，分散在不同文件夹',
+      groupHere: '归到一起',
+      grouped: '已整理',
+      errorBanner: '⚠️ 无法访问 Chrome 书签接口。请通过「加载已解压的扩展程序」把这个文件夹作为扩展安装后，再打开新标签页使用——不能直接双击这个 HTML 文件打开。',
+      exportFilePrefix: 'chrome_bookmarks_备份_',
+      locale: 'zh',
+    },
+    en: {
+      brand: 'Bookmark Organizer',
+      searchPlaceholder: 'Search title or URL...',
+      filterTitle: 'Filter by type',
+      filterAll: 'All Types',
+      filterOther: 'Other Sites',
+      sortTitle: 'Sort by',
+      sortDateDesc: 'Recently Added',
+      sortDateAsc: 'Oldest First',
+      sortTitleAsc: 'Title A→Z',
+      sortTitleDesc: 'Title Z→A',
+      groupSuggestBtn: 'Smart Group',
+      deadLinkBtn: 'Check Dead Links',
+      refreshBtn: 'Refresh',
+      saveJsonBtn: 'Export Backup (JSON)',
+      appearanceBtn: '⚙ Appearance',
+      cardSizeLabel: 'Card Size',
+      sizeSm: 'Small', sizeMd: 'Medium', sizeLg: 'Large',
+      darkModeLabel: 'Dark Mode',
+      viewsLabel: 'Views',
+      foldersLabel: 'Folders',
+      newFolderBtn: 'New Folder',
+      trashZone: 'Drag here to delete',
+      autoSelectDupBtn: 'Select All Extra Duplicates',
+      emptyState: 'No bookmarks here yet',
+      moveBtn: 'Move',
+      deleteSelectedBtn: 'Delete',
+      clearSelectionBtn: 'Clear Selection',
+      allBookmarks: '📚 All Bookmarks',
+      duplicates: '🔁 Duplicates',
+      unnamedFolder: 'Untitled Folder',
+      itemsSuffix: ' items',
+      filteredSuffix: ' (filtered by keyword)',
+      selectedCount: n => n + ' selected',
+      youtubeBadge: 'YouTube',
+      deadBadge: '⚠ Possibly dead',
+      dupBadge: n => 'Duplicate ×' + n,
+      folderCreated: name => 'Created folder "' + name + '"',
+      folderCreatedMoved: (name, n) => 'Created folder "' + name + '" and moved ' + n + ' items',
+      movedTo: (n, name) => 'Moved ' + n + ' items to "' + name + '"',
+      refreshed: 'Refreshed',
+      selectedDup: n => 'Selected ' + n + ' extra duplicates — ready to delete',
+      noDup: 'No extra duplicates found',
+      noBookmarksInView: 'No bookmarks in the current view',
+      scanning: (done, total) => 'Scanning ' + done + '/' + total,
+      scanDone: n => 'Scan complete — found ' + n + ' possibly dead links (browser-limited, for reference only)',
+      deleted: n => 'Deleted ' + n + ' items',
+      exported: 'Bookmark backup exported',
+      newFolderTitle: 'New Folder',
+      newFolderName: 'Folder name',
+      cancel: 'Cancel',
+      create: 'Create',
+      confirmDeleteTitle: 'Delete selected items?',
+      confirmDeleteBody: n => 'This will remove ' + n + ' items from your Chrome bookmarks. This cannot be undone.',
+      delete: 'Delete',
+      smartGroupTitle: 'Smart Grouping Suggestions',
+      smartGroupEmptyBody: 'No obvious groupings found yet. When a site has 3+ bookmarks scattered across different folders, suggestions will show up here.',
+      gotIt: 'Got it',
+      smartGroupBody: 'These sites have bookmarks scattered across folders — group them into one new folder with one click:',
+      close: 'Close',
+      groupCount: n => n + ' items scattered across folders',
+      groupHere: 'Group them',
+      grouped: 'Grouped',
+      errorBanner: '⚠️ Cannot access the Chrome bookmarks API. Please install this folder as an extension via "Load unpacked" and open a new tab — don\'t open this HTML file directly.',
+      exportFilePrefix: 'chrome_bookmarks_backup_',
+      locale: 'en',
+    },
+  };
+  function detectDefaultLang(){
+    const saved = localStorage.getItem('bm_lang');
+    if(saved === 'zh' || saved === 'en') return saved;
+    return (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  }
+  function t(key, ...args){
+    const dict = I18N[state.lang] || I18N.zh;
+    const val = dict[key];
+    return typeof val === 'function' ? val(...args) : val;
+  }
+  function applyStaticI18n(){
+    document.documentElement.lang = state.lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = t('brand');
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  }
+
   if(!(window.chrome && chrome.bookmarks)){
+    const lang = detectDefaultLang();
     document.getElementById('banner').style.display = 'flex';
     document.getElementById('banner').classList.add('error');
-    document.getElementById('bannerText').textContent =
-      '⚠️ 无法访问 Chrome 书签接口。请通过「加载已解压的扩展程序」把这个文件夹作为扩展安装后，再打开新标签页使用——不能直接双击这个 HTML 文件打开。';
+    document.getElementById('bannerText').textContent = I18N[lang].errorBanner;
     document.getElementById('bannerClose').addEventListener('click', () => {
       document.getElementById('banner').style.display = 'none';
     });
@@ -25,6 +180,7 @@
     cardSize: 'md',          // sm | md | lg
     darkMode: false,
     deadIds: new Set(),
+    lang: detectDefaultLang(),
   };
 
   /* ================= Chrome bookmarks <-> internal model ================= */
@@ -33,7 +189,7 @@
     return {
       id: node.id,
       type: isFolder ? 'folder' : 'bookmark',
-      title: node.title || (isFolder ? '未命名文件夹' : node.url),
+      title: node.title || (isFolder ? t('unnamedFolder') : node.url),
       url: node.url,
       dateAdded: node.dateAdded,
       parentId: parentId,
@@ -140,8 +296,8 @@
     const arr = items.slice();
     switch(state.sort){
       case 'date_asc': arr.sort((a,b) => (a.node.dateAdded||0) - (b.node.dateAdded||0)); break;
-      case 'title_asc': arr.sort((a,b) => (a.node.title||'').localeCompare(b.node.title||'', 'zh')); break;
-      case 'title_desc': arr.sort((a,b) => (b.node.title||'').localeCompare(a.node.title||'', 'zh')); break;
+      case 'title_asc': arr.sort((a,b) => (a.node.title||'').localeCompare(b.node.title||'', t('locale'))); break;
+      case 'title_desc': arr.sort((a,b) => (b.node.title||'').localeCompare(a.node.title||'', t('locale'))); break;
       case 'date_desc':
       default: arr.sort((a,b) => (b.node.dateAdded||0) - (a.node.dateAdded||0)); break;
     }
@@ -198,8 +354,8 @@
     const total = countBookmarks(state.tree);
     const dupCount = computeDuplicateGroups().reduce((s,g) => s + g.items.length, 0);
     virtualViewsEl.innerHTML = '';
-    virtualViewsEl.appendChild(makeTreeRow({label:'📚 全部书签', count: total, view:'all'}));
-    virtualViewsEl.appendChild(makeTreeRow({label:'🔁 重复书签', count: dupCount, view:'duplicates'}));
+    virtualViewsEl.appendChild(makeTreeRow({label:t('allBookmarks'), count: total, view:'all'}));
+    virtualViewsEl.appendChild(makeTreeRow({label:t('duplicates'), count: dupCount, view:'duplicates'}));
   }
 
   function makeTreeRow({label, count, view, depth, folderId, hasChildren, expanded}){
@@ -301,16 +457,16 @@
 
   function renderMainHeader(){
     if(state.currentView === 'all'){
-      mainTitleEl.textContent = '📚 全部书签';
+      mainTitleEl.textContent = t('allBookmarks');
     } else if(state.currentView === 'duplicates'){
-      mainTitleEl.textContent = '🔁 重复书签';
+      mainTitleEl.textContent = t('duplicates');
     } else if(state.currentView.startsWith('folder:')){
       const fid = state.currentView.slice(7);
       const f = findNode(state.tree, fid);
       mainTitleEl.textContent = f ? ('📁 ' + f.title) : '';
     }
     const items = currentBookmarks();
-    mainSubEl.textContent = items.length + ' 项' + (state.searchQuery ? '（已按关键词筛选）' : '');
+    mainSubEl.textContent = items.length + t('itemsSuffix') + (state.searchQuery ? t('filteredSuffix') : '');
     document.getElementById('autoSelectDupBtn').style.display = state.currentView === 'duplicates' ? 'inline-flex' : 'none';
   }
 
@@ -336,7 +492,7 @@
       thumb.appendChild(play);
       const badge = document.createElement('div');
       badge.className = 'yt-badge';
-      badge.textContent = 'YouTube';
+      badge.textContent = t('youtubeBadge');
       thumb.appendChild(badge);
     } else {
       thumb.classList.add('generic');
@@ -360,12 +516,12 @@
     if(state.deadIds.has(node.id)){
       const deadBadge = document.createElement('div');
       deadBadge.className = 'dead-badge';
-      deadBadge.textContent = '⚠ 可能失效';
+      deadBadge.textContent = t('deadBadge');
       thumb.appendChild(deadBadge);
     } else if(dupCount && dupCount > 1){
       const dupBadge = document.createElement('div');
       dupBadge.className = 'dup-badge';
-      dupBadge.textContent = '重复 ×' + dupCount;
+      dupBadge.textContent = t('dupBadge', dupCount);
       thumb.appendChild(dupBadge);
     }
     card.appendChild(thumb);
@@ -461,7 +617,7 @@
     });
     const bar = document.getElementById('selectionBar');
     const n = state.selection.size;
-    document.getElementById('selectionCount').textContent = '已选择 ' + n + ' 项';
+    document.getElementById('selectionCount').textContent = t('selectedCount', n);
     bar.classList.toggle('show', n > 0);
   }
 
@@ -510,10 +666,10 @@
     const parentId = (state.tree.children[0] && state.tree.children[0].id) || '1';
     chrome.bookmarks.create({parentId, title}, (newFolder) => {
       if(thenMoveIds && thenMoveIds.length){
-        moveNodesLive(thenMoveIds, newFolder.id, () => showToast('已创建文件夹「' + title + '」并移动 ' + thenMoveIds.length + ' 项'));
+        moveNodesLive(thenMoveIds, newFolder.id, () => showToast(t('folderCreatedMoved', title, thenMoveIds.length)));
       } else {
         doReload();
-        showToast('已创建文件夹「' + title + '」');
+        showToast(t('folderCreated', title));
       }
     });
   }
@@ -525,7 +681,7 @@
     const n = ids.length;
     moveNodesLive(ids, targetFolderId, () => {
       clearSelection();
-      showToast('已移动 ' + n + ' 项到「' + target.title + '」');
+      showToast(t('movedTo', n, target.title));
     });
   }
 
@@ -572,7 +728,7 @@
     openModal('confirmDelete', {ids: Array.from(state.selection)});
   });
   document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
-  document.getElementById('refreshBtn').addEventListener('click', () => { doReload(); showToast('已刷新'); });
+  document.getElementById('refreshBtn').addEventListener('click', () => { doReload(); showToast(t('refreshed')); });
 
   /* ================= Search / filter / sort ================= */
   document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -598,7 +754,7 @@
     });
     state.selection = new Set(toSelect);
     renderSelectionUI();
-    showToast(toSelect.length ? ('已选中 ' + toSelect.length + ' 个多余的重复项，可以直接删除') : '没有发现多余的重复项');
+    showToast(toSelect.length ? t('selectedDup', toSelect.length) : t('noDup'));
   });
 
   /* ================= Smart grouping suggestions ================= */
@@ -609,7 +765,7 @@
   /* ================= Dead-link detection (best-effort) ================= */
   document.getElementById('deadLinkBtn').addEventListener('click', async () => {
     const items = currentBookmarks();
-    if(items.length === 0){ showToast('当前视图没有书签'); return; }
+    if(items.length === 0){ showToast(t('noBookmarksInView')); return; }
     const btn = document.getElementById('deadLinkBtn');
     const progressEl = document.getElementById('scanProgress');
     btn.disabled = true;
@@ -622,7 +778,7 @@
         const my = idx++;
         const node = items[my].node;
         if(!/^https?:\/\//i.test(node.url || '')){
-          done++; progressEl.textContent = '检测中 ' + done + '/' + items.length;
+          done++; progressEl.textContent = t('scanning', done, items.length);
           continue;
         }
         try{
@@ -634,14 +790,14 @@
           state.deadIds.add(node.id);
         }
         done++;
-        progressEl.textContent = '检测中 ' + done + '/' + items.length;
+        progressEl.textContent = t('scanning', done, items.length);
       }
     }
     await Promise.all(Array.from({length: CONCURRENCY}, worker));
     btn.disabled = false;
     progressEl.textContent = '';
     renderGrid();
-    showToast('检测完成，发现 ' + state.deadIds.size + ' 个可能失效的链接（受浏览器限制，此结果仅供参考）');
+    showToast(t('scanDone', state.deadIds.size));
   });
 
   /* ================= Appearance settings ================= */
@@ -684,17 +840,17 @@
     modalBox.className = 'modal';
     if(type === 'newFolder'){
       modalBox.innerHTML = `
-        <h3>新建文件夹</h3>
-        <input type="text" id="newFolderName" placeholder="文件夹名称" autofocus>
+        <h3>${t('newFolderTitle')}</h3>
+        <input type="text" id="newFolderName" placeholder="${escapeHtml(t('newFolderName'))}" autofocus>
         <div class="modal-actions">
-          <button class="btn ghost small" id="modalCancel">取消</button>
-          <button class="btn primary small" id="modalConfirm">创建</button>
+          <button class="btn ghost small" id="modalCancel">${t('cancel')}</button>
+          <button class="btn primary small" id="modalConfirm">${t('create')}</button>
         </div>`;
       modalOverlay.classList.add('show');
       const input = document.getElementById('newFolderName');
       input.focus();
       const confirm = () => {
-        const name = input.value.trim() || '新建文件夹';
+        const name = input.value.trim() || t('newFolderTitle');
         closeModal();
         createFolderLive(name, payload && payload.thenMoveIds);
         clearSelection();
@@ -704,17 +860,17 @@
       input.addEventListener('keydown', (e) => { if(e.key === 'Enter') confirm(); if(e.key==='Escape') closeModal(); });
     } else if(type === 'confirmDelete'){
       modalBox.innerHTML = `
-        <h3>删除所选项？</h3>
-        <p>将从 Chrome 书签中删除 ${payload.ids.length} 项，此操作不可撤销。</p>
+        <h3>${t('confirmDeleteTitle')}</h3>
+        <p>${t('confirmDeleteBody', payload.ids.length)}</p>
         <div class="modal-actions">
-          <button class="btn ghost small" id="modalCancel">取消</button>
-          <button class="btn primary small" id="modalConfirm" style="background:#c62828;border-color:#c62828;">删除</button>
+          <button class="btn ghost small" id="modalCancel">${t('cancel')}</button>
+          <button class="btn primary small" id="modalConfirm" style="background:#c62828;border-color:#c62828;">${t('delete')}</button>
         </div>`;
       modalOverlay.classList.add('show');
       document.getElementById('modalConfirm').addEventListener('click', () => {
         const n = payload.ids.length;
         closeModal();
-        deleteNodesLive(payload.ids, () => showToast('已删除 ' + n + ' 项'));
+        deleteNodesLive(payload.ids, () => showToast(t('deleted', n)));
         clearSelection();
       });
       document.getElementById('modalCancel').addEventListener('click', closeModal);
@@ -722,10 +878,10 @@
       const list = payload.suggestions;
       if(list.length === 0){
         modalBox.innerHTML = `
-          <h3>智能分组建议</h3>
-          <p>暂时没有发现明显可以归到一起的书签。当同一个网站有 3 个以上书签分散在不同文件夹时，这里会给出建议。</p>
+          <h3>${t('smartGroupTitle')}</h3>
+          <p>${t('smartGroupEmptyBody')}</p>
           <div class="modal-actions">
-            <button class="btn primary small" id="modalCancel">知道了</button>
+            <button class="btn primary small" id="modalCancel">${t('gotIt')}</button>
           </div>`;
         modalOverlay.classList.add('show');
         document.getElementById('modalCancel').addEventListener('click', closeModal);
@@ -733,11 +889,11 @@
       }
       modalBox.className = 'modal wide';
       modalBox.innerHTML = `
-        <h3>智能分组建议</h3>
-        <p>下面这些网站的书签分散在不同地方，可以一键归到同一个新文件夹：</p>
+        <h3>${t('smartGroupTitle')}</h3>
+        <p>${t('smartGroupBody')}</p>
         <div id="suggestList"></div>
         <div class="modal-actions">
-          <button class="btn ghost small" id="modalCancel">关闭</button>
+          <button class="btn ghost small" id="modalCancel">${t('close')}</button>
         </div>`;
       const listEl = modalBox.querySelector('#suggestList');
       list.forEach((s) => {
@@ -745,14 +901,14 @@
         row.className = 'suggest-row';
         const info = document.createElement('div');
         info.className = 'info';
-        info.innerHTML = `<div>${escapeHtml(s.domain)}</div><div class="n">${s.count} 项，分散在不同文件夹</div>`;
+        info.innerHTML = `<div>${escapeHtml(s.domain)}</div><div class="n">${escapeHtml(t('groupCount', s.count))}</div>`;
         row.appendChild(info);
         const btn = document.createElement('button');
         btn.className = 'btn small primary';
-        btn.textContent = '归到一起';
+        btn.textContent = t('groupHere');
         btn.addEventListener('click', () => {
           btn.disabled = true;
-          btn.textContent = '已整理';
+          btn.textContent = t('grouped');
           row.style.opacity = '0.5';
           createFolderLive(s.domain, s.ids);
         });
@@ -781,13 +937,22 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'chrome_bookmarks_备份_' + new Date().toISOString().slice(0,10) + '.json';
+      a.download = t('exportFilePrefix') + new Date().toISOString().slice(0,10) + '.json';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 2000);
-      showToast('已导出书签备份');
+      showToast(t('exported'));
     });
+  });
+
+  /* ================= Language toggle ================= */
+  document.getElementById('langToggleBtn').addEventListener('click', () => {
+    state.lang = state.lang === 'zh' ? 'en' : 'zh';
+    localStorage.setItem('bm_lang', state.lang);
+    applyStaticI18n();
+    closeModal();
+    render();
   });
 
   /* ================= Init ================= */
@@ -796,5 +961,6 @@
   document.documentElement.setAttribute('data-theme', state.darkMode ? 'dark' : '');
   darkToggle.checked = state.darkMode;
   updateSizeToggleUI();
+  applyStaticI18n();
   doReload();
 })();
