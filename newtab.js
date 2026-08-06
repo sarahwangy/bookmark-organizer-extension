@@ -509,9 +509,10 @@
       return section;
     }
     const maxCount = Math.max(...items.map(i => i.count), 1);
-    items.forEach(({label, count}) => {
+    items.forEach(item => {
+      const {label, count} = item;
       const row = document.createElement('div');
-      row.className = 'bar-row';
+      row.className = 'bar-row' + (opts.onClick ? ' clickable' : '');
       const l = document.createElement('span');
       l.className = 'bar-label';
       l.textContent = label;
@@ -528,6 +529,7 @@
       row.appendChild(l);
       row.appendChild(track);
       row.appendChild(c);
+      if(opts.onClick) row.addEventListener('click', () => opts.onClick(item));
       section.appendChild(row);
     });
     return section;
@@ -562,7 +564,8 @@
 
     el.appendChild(buildBarSection(
       t('sectionCategory'),
-      a.categories.map(c => ({label: t('cat_' + c.key), count: c.count}))
+      a.categories.map(c => ({label: t('cat_' + c.key), count: c.count, key: c.key})),
+      {onClick: item => goToFilteredView({view: 'category:' + item.key})}
     ));
 
     const ytSection = document.createElement('div');
@@ -574,22 +577,28 @@
     stack.className = 'stack-bar';
     const ytPct = a.total ? (a.ytCount / a.total * 100) : 0;
     const ytSeg = document.createElement('div');
-    ytSeg.className = 'seg';
+    ytSeg.className = 'seg clickable';
     ytSeg.style.width = ytPct + '%';
     ytSeg.style.background = '#e8542e';
+    ytSeg.addEventListener('click', () => goToFilteredView({view: 'all', typeFilter: 'youtube'}));
     const otherSeg = document.createElement('div');
-    otherSeg.className = 'seg';
+    otherSeg.className = 'seg clickable';
     otherSeg.style.width = (100 - ytPct) + '%';
     otherSeg.style.background = '#94a3b8';
+    otherSeg.addEventListener('click', () => goToFilteredView({view: 'all', typeFilter: 'other'}));
     stack.appendChild(ytSeg);
     stack.appendChild(otherSeg);
     ytSection.appendChild(stack);
     const legend = document.createElement('div');
     legend.className = 'stack-legend';
     const ytLegend = document.createElement('span');
+    ytLegend.className = 'clickable';
     ytLegend.innerHTML = '<span class="dot" style="background:#e8542e"></span>YouTube (' + a.ytCount + ')';
+    ytLegend.addEventListener('click', () => goToFilteredView({view: 'all', typeFilter: 'youtube'}));
     const otherLegend = document.createElement('span');
+    otherLegend.className = 'clickable';
     otherLegend.innerHTML = '<span class="dot" style="background:#94a3b8"></span>' + escapeHtml(t('other')) + ' (' + a.otherCount + ')';
+    otherLegend.addEventListener('click', () => goToFilteredView({view: 'all', typeFilter: 'other'}));
     legend.appendChild(ytLegend);
     legend.appendChild(otherLegend);
     ytSection.appendChild(legend);
@@ -597,27 +606,38 @@
 
     el.appendChild(buildBarSection(
       t('sectionTopDomains'),
-      a.topDomains.map(d => ({label: d.domain, count: d.count}))
+      a.topDomains.map(d => ({label: d.domain, count: d.count, domain: d.domain})),
+      {onClick: item => goToFilteredView({view: 'site:' + item.domain})}
     ));
 
     el.appendChild(buildBarSection(
       t('sectionFolders'),
-      a.folders.map(f => ({label: f.name, count: f.count}))
+      a.folders.map(f => ({label: f.name, count: f.count, name: f.name})),
+      {onClick: item => {
+        const folder = state.tree.children.find(c => c.type === 'folder' && c.title === item.name);
+        if(folder) goToFilteredView({view: 'folder:' + folder.id});
+      }}
     ));
 
     el.appendChild(buildBarSection(
       t('sectionYearly'),
-      a.years.map(([y, count]) => ({label: y, count})),
-      {note: a.peakYear ? t('peakYearNote', a.peakYear[0], a.peakYear[1]) : null}
+      a.years.map(([y, count]) => ({label: y, count, year: y})),
+      {
+        note: a.peakYear ? t('peakYearNote', a.peakYear[0], a.peakYear[1]) : null,
+        onClick: item => goToFilteredView({view: 'year:' + item.year}),
+      }
     ));
 
     el.appendChild(buildBarSection(
       t('sectionMonthly'),
-      a.months.map(([ym, count]) => ({label: ym, count})),
-      {note: [
-        a.peakMonth ? t('peakMonthNote', a.peakMonth[0], a.peakMonth[1]) : null,
-        a.monthsTruncated ? t('monthlyTruncated', a.monthsTotal) : null,
-      ].filter(Boolean).join(' · ') || null}
+      a.months.map(([ym, count]) => ({label: ym, count, ym})),
+      {
+        note: [
+          a.peakMonth ? t('peakMonthNote', a.peakMonth[0], a.peakMonth[1]) : null,
+          a.monthsTruncated ? t('monthlyTruncated', a.monthsTotal) : null,
+        ].filter(Boolean).join(' · ') || null,
+        onClick: item => goToFilteredView({view: 'month:' + item.ym}),
+      }
     ));
 
     const sugSection = document.createElement('div');
@@ -863,6 +883,21 @@
       items = allBookmarks(state.tree)
         .filter(x => domainOf(x.node.url) === domain)
         .map(x => ({node:x.node, path: x.path.join(' / ')}));
+    } else if(state.currentView.startsWith('category:')){
+      const key = state.currentView.slice(9);
+      items = allBookmarks(state.tree)
+        .filter(x => classifyBookmark(x.node) === key)
+        .map(x => ({node:x.node, path: x.path.join(' / ')}));
+    } else if(state.currentView.startsWith('year:')){
+      const y = state.currentView.slice(5);
+      items = allBookmarks(state.tree)
+        .filter(x => x.node.dateAdded && yearMonthOf(x.node.dateAdded).slice(0, 4) === y)
+        .map(x => ({node:x.node, path: x.path.join(' / ')}));
+    } else if(state.currentView.startsWith('month:')){
+      const ym = state.currentView.slice(6);
+      items = allBookmarks(state.tree)
+        .filter(x => x.node.dateAdded && yearMonthOf(x.node.dateAdded) === ym)
+        .map(x => ({node:x.node, path: x.path.join(' / ')}));
     } else {
       items = [];
     }
@@ -908,6 +943,12 @@
       mainTitleEl.textContent = f ? ('📁 ' + f.title) : '';
     } else if(state.currentView.startsWith('site:')){
       mainTitleEl.textContent = '🌐 ' + state.currentView.slice(5);
+    } else if(state.currentView.startsWith('category:')){
+      mainTitleEl.textContent = '🏷️ ' + t('cat_' + state.currentView.slice(9));
+    } else if(state.currentView.startsWith('year:')){
+      mainTitleEl.textContent = '📅 ' + state.currentView.slice(5);
+    } else if(state.currentView.startsWith('month:')){
+      mainTitleEl.textContent = '📅 ' + state.currentView.slice(6);
     }
     const items = currentBookmarks();
     mainSubEl.textContent = items.length + t('itemsSuffix') + ((state.searchQuery || hasDateFilter()) ? t('filteredSuffix') : '');
@@ -1255,6 +1296,18 @@
   function clearSelection(){
     state.selection = new Set();
     renderSelectionUI();
+  }
+
+  function goToFilteredView({view, typeFilter}){
+    state.currentView = view;
+    state.typeFilter = typeFilter || 'all';
+    document.getElementById('typeFilter').value = state.typeFilter;
+    state.searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    state.dateFrom = '';
+    state.dateTo = '';
+    clearSelection();
+    render();
   }
 
   /* ================= Mutations via chrome.bookmarks ================= */
