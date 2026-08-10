@@ -116,6 +116,7 @@
       groupHere: '归到一起',
       grouped: '已整理',
       errorBanner: '⚠️ 无法访问 Chrome 书签接口。请通过「加载已解压的扩展程序」把这个文件夹作为扩展安装后，再打开新标签页使用——不能直接双击这个 HTML 文件打开。',
+      whatsNewBanner: v => '✨ 已更新到 v' + v + '，有新功能或改进，详见项目 README 的更新说明。',
       exportFilePrefix: 'chrome_bookmarks_备份_',
       locale: 'zh',
     },
@@ -232,6 +233,7 @@
       groupHere: 'Group them',
       grouped: 'Grouped',
       errorBanner: '⚠️ Cannot access the Chrome bookmarks API. Please install this folder as an extension via "Load unpacked" and open a new tab — don\'t open this HTML file directly.',
+      whatsNewBanner: v => '✨ Updated to v' + v + ' — see the project README for what\'s new.',
       exportFilePrefix: 'chrome_bookmarks_backup_',
       locale: 'en',
     },
@@ -263,6 +265,20 @@
       document.getElementById('banner').style.display = 'none';
     });
     return;
+  }
+
+  function maybeShowWhatsNew(){
+    const currentVersion = chrome.runtime.getManifest().version;
+    const lastSeen = localStorage.getItem('bm_last_seen_version');
+    localStorage.setItem('bm_last_seen_version', currentVersion);
+    if(!lastSeen || lastSeen === currentVersion) return;
+    const banner = document.getElementById('banner');
+    banner.classList.remove('error');
+    document.getElementById('bannerText').textContent = t('whatsNewBanner', currentVersion);
+    banner.style.display = 'flex';
+    document.getElementById('bannerClose').addEventListener('click', () => {
+      banner.style.display = 'none';
+    }, {once: true});
   }
 
   /* ================= State ================= */
@@ -1879,5 +1895,6 @@
   updateSizeToggleUI();
   updateViewModeToggleUI();
   applyStaticI18n();
+  maybeShowWhatsNew();
   doReload();
 })();
