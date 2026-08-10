@@ -63,6 +63,7 @@
       peakMonthNote: (ym, n) => '添加最多的月份：' + ym + '（' + n + ' 项）',
       sectionSuggestions: '整理建议',
       monthlyTruncated: n => '只显示最近 24 个月（共 ' + n + ' 个月有记录）',
+      foldersTruncated: n => '只显示书签数最多的 12 个文件夹（共 ' + n + ' 个文件夹有书签）',
       analyticsNote: '主题分类基于本地关键词匹配，完全在你的浏览器里计算，不调用任何 AI 接口，不需要 API Key，也不会有任何数据离开你的浏览器。',
       cat_work: '求职 / 工作',
       cat_ai_tech: 'AI / 技术',
@@ -178,6 +179,7 @@
       peakMonthNote: (ym, n) => 'Most active month: ' + ym + ' (' + n + ' items)',
       sectionSuggestions: 'Cleanup Suggestions',
       monthlyTruncated: n => 'Showing the most recent 24 months (' + n + ' months total have data)',
+      foldersTruncated: n => 'Showing the 12 folders with the most bookmarks (' + n + ' folders total have bookmarks)',
       analyticsNote: 'Topic classification runs on local keyword matching entirely inside your browser — no AI API is called, no API key is needed, and no data ever leaves your browser.',
       cat_work: 'Work & Career',
       cat_ai_tech: 'AI & Tech',
@@ -339,13 +341,16 @@
     }
     return acc;
   }
-  function allBookmarks(node, acc, path){
+  function allBookmarks(node, acc, path, parentId){
     acc = acc || [];
     path = path || [];
     if(node.type === 'bookmark'){
-      acc.push({node, path});
+      acc.push({node, path, folderId: parentId});
     } else if(node.children){
-      node.children.forEach(c => allBookmarks(c, acc, node.id === '0' ? path : path.concat(node.title)));
+      const isRoot = node.id === '0';
+      const childPath = isRoot ? path : path.concat(node.title);
+      const childParentId = isRoot ? parentId : node.id;
+      node.children.forEach(c => allBookmarks(c, acc, childPath, childParentId));
     }
     return acc;
   }
@@ -452,12 +457,15 @@
     const byFolder = new Map();
     const byMonth = new Map();
     let ytCount = 0;
-    all.forEach(({node, path}) => {
+    all.forEach(({node, path, folderId}) => {
       const cat = classifyBookmark(node);
       byCategory.set(cat, (byCategory.get(cat) || 0) + 1);
       if(getYouTubeId(node.url)) ytCount++;
-      const topFolder = (path && path.length) ? path[0] : t('unsortedLabel');
-      byFolder.set(topFolder, (byFolder.get(topFolder) || 0) + 1);
+      const folderKey = folderId || 'unsorted';
+      if(!byFolder.has(folderKey)){
+        byFolder.set(folderKey, {name: (path && path.length) ? path.join(' / ') : t('unsortedLabel'), count: 0, folderId});
+      }
+      byFolder.get(folderKey).count++;
       if(node.dateAdded){
         const ym = yearMonthOf(node.dateAdded);
         byMonth.set(ym, (byMonth.get(ym) || 0) + 1);
@@ -466,8 +474,7 @@
     const categories = Array.from(byCategory.entries())
       .map(([key, count]) => ({key, count}))
       .sort((a,b) => b.count - a.count);
-    const folders = Array.from(byFolder.entries())
-      .map(([name, count]) => ({name, count}))
+    const folders = Array.from(byFolder.values())
       .sort((a,b) => b.count - a.count);
     const monthsAll = Array.from(byMonth.entries()).sort((a,b) => a[0].localeCompare(b[0]));
     const monthsTruncated = monthsAll.length > 24;
@@ -516,6 +523,12 @@
     const h = document.createElement('h3');
     h.textContent = title;
     section.appendChild(h);
+    if(opts.note){
+      const note = document.createElement('div');
+      note.className = 'analytics-note';
+      note.textContent = opts.note;
+      section.appendChild(note);
+    }
     if(!items.length){
       const hint = document.createElement('div');
       hint.className = 'empty-hint';
@@ -703,11 +716,11 @@
 
     el.appendChild(buildPieChart(
       t('sectionFolders'),
-      a.folders.map(f => ({label: f.name, count: f.count, name: f.name})),
-      {onClick: item => {
-        const folder = state.tree.children.find(c => c.type === 'folder' && c.title === item.name);
-        if(folder) goToFilteredView({view: 'folder:' + folder.id});
-      }}
+      a.folders.slice(0, 12).map(f => ({label: f.name, count: f.count, folderId: f.folderId})),
+      {
+        note: a.folders.length > 12 ? t('foldersTruncated', a.folders.length) : null,
+        onClick: item => { if(item.folderId) goToFilteredView({view: 'folder:' + item.folderId}); },
+      }
     ));
 
     el.appendChild(buildBarSection(
@@ -1305,6 +1318,62 @@
     return row;
   }
 
+  function groupByDomain(items){
+    const groups = new Map();
+    items.forEach(item => {
+      const d = domainOf(item.node.url) || '';
+      if(!groups.has(d)) groups.set(d, []);
+      groups.get(d).push(item);
+    });
+    return Array.from(groups.keys()).sort((a,b) => a.localeCompare(b))
+      .map(domain => ({domain, items: groups.get(domain)}));
+  }
+
+  function letterOf(domain){
+    const ch = (domain || '').trim().charAt(0).toUpperCase();
+    return /[A-Z]/.test(ch) ? ch : '#';
+  }
+
+  const AZ_LETTERS = ['#','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+  function computeAllLetters(){
+    const letters = new Set();
+    allBookmarks(state.tree).forEach(({node}) => letters.add(letterOf(domainOf(node.url) || '')));
+    return letters;
+  }
+  function jumpToLetter(letter){
+    const scrollToGroup = () => {
+      const target = gridEl.querySelector('.list-group[data-letter="' + letter + '"]');
+      if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+    if(state.currentView !== 'all'){
+      goToFilteredView({view: 'all'});
+    }
+    scrollToGroup();
+  }
+  function renderAzIndex(show){
+    const el = document.getElementById('azIndex');
+    if(!show){
+      el.classList.add('hidden');
+      el.innerHTML = '';
+      return;
+    }
+    const present = computeAllLetters();
+    el.classList.remove('hidden');
+    el.innerHTML = '';
+    AZ_LETTERS.forEach(letter => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'az-letter';
+      btn.textContent = letter;
+      if(!present.has(letter)){
+        btn.disabled = true;
+      } else {
+        btn.addEventListener('click', () => jumpToLetter(letter));
+      }
+      el.appendChild(btn);
+    });
+  }
+
   function renderGrid(){
     const analyticsEl = document.getElementById('analyticsView');
     if(state.currentView === 'analytics'){
@@ -1312,6 +1381,7 @@
       emptyStateEl.style.display = 'none';
       analyticsEl.classList.remove('hidden');
       renderAnalyticsView();
+      renderAzIndex(false);
       return;
     }
     analyticsEl.classList.add('hidden');
@@ -1321,23 +1391,20 @@
     gridEl.innerHTML = '';
     if(items.length === 0){
       emptyStateEl.style.display = 'flex';
-      gridEl.className = state.viewMode === 'list' ? 'list' : ('grid size-' + state.cardSize);
+      gridEl.className = state.viewMode === 'list' ? 'list' : 'grid-groups';
+      renderAzIndex(false);
       return;
     }
     emptyStateEl.style.display = 'none';
 
+    const groups = groupByDomain(items);
+
     if(state.viewMode === 'list'){
       gridEl.className = 'list';
-      const groups = new Map();
-      items.forEach(item => {
-        const d = domainOf(item.node.url) || '';
-        if(!groups.has(d)) groups.set(d, []);
-        groups.get(d).push(item);
-      });
-      Array.from(groups.keys()).sort((a,b) => a.localeCompare(b)).forEach(domain => {
-        const groupItems = groups.get(domain);
+      groups.forEach(({domain, items: groupItems}) => {
         const groupEl = document.createElement('div');
         groupEl.className = 'list-group';
+        groupEl.dataset.letter = letterOf(domain);
         const title = document.createElement('div');
         title.className = 'list-group-title';
         title.textContent = (domain || '—').toUpperCase() + ' (' + groupItems.length + ')';
@@ -1346,9 +1413,23 @@
         gridEl.appendChild(groupEl);
       });
     } else {
-      gridEl.className = 'grid size-' + state.cardSize;
-      items.forEach(item => gridEl.appendChild(renderCard(item)));
+      gridEl.className = 'grid-groups';
+      groups.forEach(({domain, items: groupItems}) => {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'list-group';
+        groupEl.dataset.letter = letterOf(domain);
+        const title = document.createElement('div');
+        title.className = 'list-group-title';
+        title.textContent = (domain || '—').toUpperCase() + ' (' + groupItems.length + ')';
+        groupEl.appendChild(title);
+        const cardGrid = document.createElement('div');
+        cardGrid.className = 'grid size-' + state.cardSize;
+        groupItems.forEach(item => cardGrid.appendChild(renderCard(item)));
+        groupEl.appendChild(cardGrid);
+        gridEl.appendChild(groupEl);
+      });
     }
+    renderAzIndex(true);
   }
 
   function renderMoveSelect(){
@@ -1421,6 +1502,18 @@
     renderSelectionUI();
   }
 
+  function findAncestorFolderIds(node, targetId, trail){
+    trail = trail || [];
+    if(node.id === targetId) return trail;
+    if(node.children){
+      for(const c of node.children){
+        const found = findAncestorFolderIds(c, targetId, trail.concat(node.id));
+        if(found) return found;
+      }
+    }
+    return null;
+  }
+
   function goToFilteredView({view, typeFilter}){
     state.currentView = view;
     state.typeFilter = typeFilter || 'all';
@@ -1430,7 +1523,16 @@
     state.dateFrom = '';
     state.dateTo = '';
     clearSelection();
+    if(view.startsWith('folder:')){
+      const folderId = view.slice(7);
+      const ancestors = findAncestorFolderIds(state.tree, folderId);
+      if(ancestors) ancestors.forEach(id => state.collapsed.delete(id));
+    }
     render();
+    if(view.startsWith('folder:')){
+      const activeRow = folderTreeEl.querySelector('.tree-item.active');
+      if(activeRow) activeRow.scrollIntoView({block:'center', behavior:'smooth'});
+    }
   }
 
   /* ================= Mutations via chrome.bookmarks ================= */
