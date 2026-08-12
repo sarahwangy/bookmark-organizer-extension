@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>书签整理台</title>
+<title>Bookmark Atlas</title>
 <style>
   :root{
     --bg:#f4f3ef;
@@ -32,7 +32,7 @@
     flex-shrink:0; z-index:20;
   }
   .brand{display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; letter-spacing:.2px; white-space:nowrap;}
-  .brand .dot{width:10px;height:10px;border-radius:3px;background:var(--accent);}
+  .brand-icon{width:34px; height:34px; border-radius:8px; flex-shrink:0; object-fit:cover;}
   .search{
     flex:1; max-width:420px; display:flex; align-items:center; gap:8px;
     background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:7px 12px;
@@ -446,7 +446,7 @@
   </div>
 
   <div class="topbar">
-    <div class="brand"><span class="dot"></span><span data-i18n="brand">书签整理台</span></div>
+    <div class="brand"><img class="brand-icon" src="bookmark-atlas-128.svg" alt=""><span data-i18n="brand">Bookmark Atlas</span></div>
     <div class="search">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input id="searchInput" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="搜索标题或网址...">

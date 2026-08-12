@@ -3,7 +3,7 @@
   "name": "__MSG_extName__",
   "version": "1.0.0",
   "description": "__MSG_extDescription__",
-  "default_locale": "zh_CN",
+  "default_locale": "en",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
@@ -12,5 +12,13 @@
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
+  },
+  "action": {
+    "default_title": "__MSG_extName__",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
   }
 }

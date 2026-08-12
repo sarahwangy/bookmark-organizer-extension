@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="8" x2="110" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#102B68"/>
+      <stop offset="1" stop-color="#24105E"/>
+    </linearGradient>
+    <radialGradient id="globe" cx="42" cy="36" r="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#62E8D8"/>
+      <stop offset="1" stop-color="#1687D8"/>
+    </radialGradient>
+    <linearGradient id="land" x1="34" y1="32" x2="91" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#76E8B2"/>
+      <stop offset="1" stop-color="#23A76C"/>
+    </linearGradient>
+    <linearGradient id="bookmark" x1="55" y1="19" x2="80" y2="55" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE27A"/>
+      <stop offset="1" stop-color="#F5B92E"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".32"/>
+    </filter>
+    <clipPath id="globeClip"><circle cx="64" cy="68" r="36"/></clipPath>
+  </defs>
+
+  <!-- App icon background — fills the entire canvas edge-to-edge, no transparent margin -->
+  <rect x="0" y="0" width="128" height="128" fill="url(#bg)"/>
+
+  <!-- stars -->
+  <g fill="#B9D8FF" opacity=".9">
+    <path d="M24 31l1.5 3.5L29 36l-3.5 1.5L24 41l-1.5-3.5L19 36l3.5-1.5z"/>
+    <path d="M101 45l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"/>
+    <circle cx="106" cy="83" r="1.4"/>
+    <circle cx="25" cy="84" r="1.2"/>
+  </g>
+
+  <!-- enlarged globe + orbit + bookmark group -->
+  <g transform="translate(64 60) scale(1.18) translate(-64 -60)">
+    <!-- globe -->
+    <g filter="url(#shadow)">
+      <circle cx="64" cy="68" r="36" fill="url(#globe)"/>
+      <g clip-path="url(#globeClip)" fill="url(#land)">
+        <path d="M31 48c7-7 13-9 20-8 4 1 6 5 5 8-2 4-7 4-9 8-2 3 0 7-4 9-4 1-7-2-11-5z"/>
+        <path d="M63 35c8-4 15-2 19 3 3 4 1 8-3 10-3 2-3 6-7 7-4 1-7-3-9-6-2-4-4-9 0-14z"/>
+        <path d="M78 58c7-2 14 1 17 6 2 4 0 8-3 10-4 2-5 6-8 8-4 2-8-1-9-5-1-4 2-7 3-10z"/>
+        <path d="M48 72c5-2 10 0 12 4 2 3 1 6-1 9-2 3-1 8-4 11-3 3-7 0-8-4-1-5 1-8-2-12-2-3-1-6 3-8z"/>
+      </g>
+      <circle cx="64" cy="68" r="36" fill="none" stroke="#FFFFFF" stroke-opacity=".16"/>
+    </g>
+
+    <!-- orbital ring -->
+    <ellipse cx="64" cy="69" rx="51" ry="21" transform="rotate(-20 64 69)" fill="none" stroke="#FFFFFF" stroke-width="4" opacity=".92"/>
+    <ellipse cx="64" cy="69" rx="51" ry="21" transform="rotate(-20 64 69)" fill="none" stroke="#BDE5FF" stroke-opacity=".25" stroke-width="1"/>
+
+    <!-- bookmark -->
+    <g filter="url(#shadow)">
+      <path d="M55 18.5c0-2.2 1.8-4 4-4h18c2.2 0 4 1.8 4 4v37l-13-9-13 9z" fill="url(#bookmark)"/>
+      <path d="M55 18.5c0-2.2 1.8-4 4-4h18c2.2 0 4 1.8 4 4v37l-13-9-13 9z" fill="none" stroke="#FFF4B7" stroke-opacity=".45"/>
+    </g>
+  </g>
+</svg>
