@@ -1,8 +1,8 @@
-# Privacy Policy — Bookmark Organizer
+# Privacy Policy — Bookmark Atlas
 
 **Last updated: 2026-08-10**
 
-Bookmark Organizer is a Chrome extension that replaces the new-tab page with a card/list dashboard for your browser bookmarks.
+Bookmark Atlas is a Chrome extension that replaces the new-tab page with a card/list dashboard for your browser bookmarks.
 
 ## Data collection
 

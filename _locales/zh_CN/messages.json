@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "书签整理台",
+    "message": "Bookmark Atlas",
     "description": "Extension name shown in chrome://extensions and the Web Store"
   },
   "extDescription": {
-    "message": "杂志卡片式书签管理器：替换新标签页，YouTube 缩略图预览，多选 + 拖拽把书签整理进文件夹，直接读写 Chrome 真实书签。",
+    "message": "探索你的书签。Bookmark Atlas 用卡片/列表仪表盘替换新标签页——YouTube 缩略图、智能分组、数据分析图表，直接读写你真实的 Chrome 书签。",
     "description": "Extension description shown in chrome://extensions and the Web Store"
   }
 }

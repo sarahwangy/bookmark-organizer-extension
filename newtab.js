@@ -4,7 +4,7 @@
   /* ================= i18n ================= */
   const I18N = {
     zh: {
-      brand: '书签整理台',
+      brand: 'Bookmark Atlas',
       searchPlaceholder: '搜索标题或网址...',
       filterTitle: '按类型筛选',
       filterAll: '全部类型',
@@ -122,7 +122,7 @@
       locale: 'zh',
     },
     en: {
-      brand: 'Bookmark Organizer',
+      brand: 'Bookmark Atlas',
       searchPlaceholder: 'Search title or URL...',
       filterTitle: 'Filter by type',
       filterAll: 'All Types',

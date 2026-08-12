@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "Bookmark Organizer",
+    "message": "Bookmark Atlas",
     "description": "Extension name shown in chrome://extensions and the Web Store"
   },
   "extDescription": {
-    "message": "Magazine-style bookmark manager: replaces the new tab page, YouTube thumbnail previews, multi-select + drag-and-drop into folders, reads and writes your real Chrome bookmarks directly.",
+    "message": "Explore your bookmarks. A new-tab dashboard with YouTube thumbnails, smart grouping, duplicate detection, and bookmark analytics.",
     "description": "Extension description shown in chrome://extensions and the Web Store"
   }
 }
