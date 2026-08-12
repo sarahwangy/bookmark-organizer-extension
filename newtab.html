@@ -114,6 +114,11 @@
   .main-header{display:flex; align-items:baseline; gap:10px; margin-bottom:16px;}
   .main-header h1{font-size:19px; margin:0;}
   .main-header .sub{color:var(--sub); font-size:13px;}
+  .group-by-toggle{
+    display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink);
+    cursor:pointer; user-select:none; white-space:nowrap;
+  }
+  .group-by-toggle input{cursor:pointer;}
   .empty-state{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:80px 20px; color:var(--sub); text-align:center; gap:10px;
@@ -523,7 +528,11 @@
       <div class="main-header">
         <h1 id="mainTitle">全部书签</h1>
         <span class="sub" id="mainSub"></span>
-        <button class="btn small ghost" id="autoSelectDupBtn" data-i18n="autoSelectDupBtn" style="display:none;margin-left:auto;">选中所有多余重复项</button>
+        <label class="group-by-toggle hidden" id="groupByToggleWrap" style="margin-left:auto;">
+          <input type="checkbox" id="groupByToggle" checked>
+          <span data-i18n="groupByLabel">按网站分组</span>
+        </label>
+        <button class="btn small ghost" id="autoSelectDupBtn" data-i18n="autoSelectDupBtn" style="display:none;">选中所有多余重复项</button>
         <button type="button" class="btn small ghost hidden" id="exportCsvBtn" data-i18n="exportCsvBtn" style="margin-left:auto;">导出 CSV 报告</button>
         <button type="button" class="btn small ghost hidden" id="exportPdfBtn" data-i18n="exportPdfBtn">导出 PDF</button>
       </div>

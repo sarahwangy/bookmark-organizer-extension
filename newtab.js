@@ -36,6 +36,7 @@
       newFolderBtn: '新建文件夹',
       trashZone: '拖到这里删除',
       autoSelectDupBtn: '选中所有多余重复项',
+      groupByLabel: '按网站分组',
       emptyState: '这里还没有书签',
       moveBtn: '移动',
       deleteSelectedBtn: '删除',
@@ -153,6 +154,7 @@
       newFolderBtn: 'New Folder',
       trashZone: 'Drag here to delete',
       autoSelectDupBtn: 'Select All Extra Duplicates',
+      groupByLabel: 'Group by site',
       emptyState: 'No bookmarks here yet',
       moveBtn: 'Move',
       deleteSelectedBtn: 'Delete',
@@ -296,6 +298,7 @@
     sort: 'date_desc',       // date_desc | date_asc | title_asc | title_desc
     cardSize: 'md',          // sm | md | lg
     viewMode: 'grid',        // grid | list
+    groupBySite: true,
     darkMode: false,
     deadIds: new Set(),
     lang: detectDefaultLang(),
@@ -1074,6 +1077,7 @@
     document.getElementById('autoSelectDupBtn').style.display = state.currentView === 'duplicates' ? 'inline-flex' : 'none';
     document.getElementById('exportCsvBtn').classList.toggle('hidden', state.currentView !== 'analytics');
     document.getElementById('exportPdfBtn').classList.toggle('hidden', state.currentView !== 'analytics');
+    document.getElementById('groupByToggleWrap').classList.toggle('hidden', state.currentView === 'analytics');
     if(state.currentView === 'analytics'){
       mainTitleEl.textContent = t('analyticsViewLabel');
       mainSubEl.textContent = t('analyticsSubtitle');
@@ -1413,6 +1417,18 @@
     }
     emptyStateEl.style.display = 'none';
 
+    if(!state.groupBySite){
+      if(state.viewMode === 'list'){
+        gridEl.className = 'list';
+        items.forEach(item => gridEl.appendChild(renderListRow(item)));
+      } else {
+        gridEl.className = 'grid size-' + state.cardSize;
+        items.forEach(item => gridEl.appendChild(renderCard(item)));
+      }
+      renderAzIndex(false);
+      return;
+    }
+
     const groups = groupByDomain(items);
 
     if(state.viewMode === 'list'){
@@ -1751,6 +1767,12 @@
       renderGrid();
     });
   });
+  const groupByToggle = document.getElementById('groupByToggle');
+  groupByToggle.addEventListener('change', () => {
+    state.groupBySite = groupByToggle.checked;
+    localStorage.setItem('bm_group_by_site', state.groupBySite ? '1' : '0');
+    renderGrid();
+  });
   const darkToggle = document.getElementById('darkModeToggle');
   darkToggle.addEventListener('change', () => {
     state.darkMode = darkToggle.checked;
@@ -1889,6 +1911,8 @@
   /* ================= Init ================= */
   state.cardSize = localStorage.getItem('bm_card_size') || 'md';
   state.viewMode = localStorage.getItem('bm_view_mode') === 'list' ? 'list' : 'grid';
+  state.groupBySite = localStorage.getItem('bm_group_by_site') !== '0';
+  groupByToggle.checked = state.groupBySite;
   state.darkMode = localStorage.getItem('bm_dark') === '1';
   document.documentElement.setAttribute('data-theme', state.darkMode ? 'dark' : '');
   darkToggle.checked = state.darkMode;
