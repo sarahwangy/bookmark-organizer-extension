@@ -4,6 +4,8 @@
 
 A Chrome new-tab extension that replaces the default new-tab page with a magazine-style card view of your bookmarks — YouTube thumbnail previews, multi-select + drag-and-drop into folders, and direct read/write access to your real Chrome bookmarks.
 
+![Demo](assets/bookmark-organizer.gif)
+
 ## Features
 
 - Replaces the new-tab page with a card-based bookmark browser
