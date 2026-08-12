@@ -1,6 +1,8 @@
-# 书签整理台 (Bookmark Organizer)
+# Bookmark Atlas
 
 **[English](README.md) | 中文**
+
+*探索你的书签。*
 
 一个 Chrome 新标签页扩展，把默认新标签页替换成杂志卡片式的书签管理界面——YouTube 视频缩略图预览、多选 + 拖拽把书签整理进文件夹，直接读写你真实的 Chrome 书签。
 
@@ -19,16 +21,31 @@
 ## 截图
 
 **网格总览** — 所有书签以卡片形式展示，可在顶部筛选/排序
-![Grid overview](screenshots/01-grid-overview.png)
+![网格总览](screenshots/small/05-grid-overview-new.png)
 
 **YouTube 缩略图** — 视频类书签自动显示真实缩略图
-![YouTube thumbnails](screenshots/02-youtube-thumbnails.png)
+![YouTube 缩略图](screenshots/small/06-youtube-thumbnails-new.png)
+
+**列表视图 + 按网站分组** — 可以自己勾选是否按域名分组
+![列表视图与分组](screenshots/small/all-bookmark-list-groupby.png)
 
 **智能分组** — 一键把分散在不同文件夹的同域名书签归到一起
-![Smart grouping](screenshots/03-smart-grouping.png)
+![智能分组建议](screenshots/small/smart-group-suggestion.png)
 
-**大卡片 + 深色模式** — 可调整卡片大小和主题
-![Large cards and settings](screenshots/04-large-cards-settings.png)
+**重复检测** — 自动找出重复书签（URL 归一化比较），一次性清理
+![重复检测](screenshots/small/07-duplicates.png)
+
+**数据分析 — 总览** — 总数统计 + 内容主题分布
+![数据分析总览](screenshots/small/08-analytics-overview.png)
+
+**数据分析 — 热门域名** — 你最常收藏的网站，饼图可点击跳转
+![数据分析热门域名](screenshots/small/09-analytics-domains.png)
+
+**数据分析 — 按年/月趋势** — 书签是什么时候加进来的，一目了然
+![数据分析年度趋势](screenshots/small/dashboard-based-on-year.png)
+
+**外观设置** — 深色模式、卡片大小可调
+![外观设置](screenshots/small/apprearance-option.png)
 
 ## 安装方法
 
@@ -38,7 +55,7 @@
 2. 在 Chrome 打开 `chrome://extensions`
 3. 打开右上角的 **开发者模式**
 4. 点击 **加载已解压的扩展程序**，选择本项目文件夹
-5. 打开一个新标签页，就能看到书签整理台了
+5. 打开一个新标签页，就能看到 Bookmark Atlas 了
 
 > 注意：`newtab.html` 必须以扩展的方式加载，不能直接双击打开这个 HTML 文件——它需要用到 `chrome.bookmarks` 接口。
 
